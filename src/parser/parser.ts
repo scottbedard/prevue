@@ -1,6 +1,6 @@
 import { JSDOM } from 'jsdom';
 import { Node } from 'highlight.js';
-import { SerializedElement } from '../types';
+import { NodeType, SerializedNode } from '../types';
 
 /**
  * Parse source code into an abstract syntax tree
@@ -10,11 +10,23 @@ import { SerializedElement } from '../types';
  */
 export function parse(source: string) {
     const rootElement = getRootElement(source);
-    const template = serialize(rootElement);
+    const template = serializeNode(rootElement);
 
     return {
         template
     };
+}
+
+/**
+ * Convert a nodeType into an easy to read string
+ * 
+ * @param  {Element}    node
+ * @return {NodeType} 
+ */
+function getNodeType(node: Element): NodeType {
+    if (node.nodeType === 1) return 'element';
+    if (node.nodeType === 3) return 'text';
+    return 'unknown';
 }
 
 /**
@@ -46,10 +58,17 @@ function getRootElement(source: string): Element {
  * @param  {Element}    el  the element being serialized
  * @return {Object}
  */
-function serialize(el: Element): SerializedElement {
+function serializeNode(node: Element): SerializedNode {
+    const nodeType = getNodeType(node);
+    const tagName = nodeType === 'element' ? node.tagName.toLowerCase() : null;
+    const textContent = nodeType === 'text' ? node.textContent : null;
+
     return {
-        children: Array.from(el.children).map(serialize),
-        tagName: el.tagName.toLowerCase(),
-        textContent: el.textContent,
+        children: nodeType === 'element'
+            ? Array.from(node.childNodes).map(child => serializeNode(<Element> child))
+            : null,
+        nodeType,
+        tagName,
+        textContent,
     };
 }

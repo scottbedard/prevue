@@ -11,8 +11,11 @@ const { template } = parse(src);
 //
 // specs
 //
-test('test_case', function () {
+test('empty element', function () {
     expect(template).toMatchObject({
-        // ...
+        children: [],
+        nodeType: 'element',
+        tagName: 'div',
+        textContent: null,
     });
 });
