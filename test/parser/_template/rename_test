@@ -1,0 +1,15 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { parse } from '../../../src/parser/parser';
+
+//
+// specs
+//
+describe('some_feature', function () {
+    const source = fs.readFileSync(path.resolve(__dirname, './component.vue'), 'utf8');
+    const { template } = parse(source);
+
+    it('hmmm', function () {
+        // ...
+    });
+});
