@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import expected from './expected';
 import { parse } from '../../../src/parser/parser';
 
 //
@@ -7,41 +8,7 @@ import { parse } from '../../../src/parser/parser';
 //
 describe('nested_elements', function () {
     const source = fs.readFileSync(path.resolve(__dirname, './component.vue'), 'utf8');
-    
-    const { template } = parse(source);
+    const output = parse(source);
    
-    it('nested elements', function () {
-        expect(template).toMatchObject({
-            "children": [
-                {
-                    "children": null,
-                    "nodeType": "text",
-                    "tagName": null,
-                    "textContent": "\n        Foo bar baz\n        "
-                },
-                {
-                    "children": [
-                        {
-                            "children": null,
-                            "nodeType": "text",
-                            "tagName": null,
-                            "textContent": "Hello world"
-                        }
-                    ],
-                    "nodeType": "element",
-                    "tagName": "p",
-                    "textContent": null
-                },
-                {
-                    "children": null,
-                    "nodeType": "text",
-                    "tagName": null,
-                    "textContent": "\n    "
-                }
-            ],
-            "nodeType": "element",
-            "tagName": "div",
-            "textContent": null
-        });
-    });
+    it('nested elements', () => expect(output).toMatchObject(expected));
 });

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import expected from './expected';
 import { parse } from '../../../src/parser/parser';
 
 //
@@ -8,14 +9,7 @@ import { parse } from '../../../src/parser/parser';
 describe('empty_element', function () {
     const src = fs.readFileSync(path.resolve(__dirname, './component.vue'), 'utf8');
     
-    const { template } = parse(src);
+    const output = parse(src);
 
-    it('empty_element', function () {
-        expect(template).toMatchObject({
-            children: [],
-            nodeType: 'element',
-            tagName: 'div',
-            textContent: null,
-        });
-    });
+    it('empty_element', () => expect(output).toMatchObject(expected));
 });
