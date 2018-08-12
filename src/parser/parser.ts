@@ -1,6 +1,6 @@
 import { JSDOM } from 'jsdom';
 import { Node } from 'highlight.js';
-import { NodeType, SerializedNode } from '../types';
+import { CompilerOptions, NodeType, SerializedNode } from '../types';
 
 /**
  * Parse source code into an abstract syntax tree
@@ -8,13 +8,42 @@ import { NodeType, SerializedNode } from '../types';
  * @param  {string} source  raw source code to parse  
  * @return {Object} 
  */
-export function parse(source: string) {
+export function parse(source: string, options: CompilerOptions = {}) {
     const rootElement = getRootElement(source);
-    const template = serializeNode(rootElement);
+    const template = serializeNode(rootElement, options);
 
     return {
         template
     };
+}
+
+/**
+ * Get child nodes, and purge empty text nodes if whitespace is being trimmed.
+ * 
+ * @param  {Element}                    node
+ * @param  {NodeType}                   nodeType
+ * @param  {CompilerOptions}            options
+ * @return {Array<SerializedNode>|null}
+ */
+function getChildNodes(
+    node: Element, 
+    nodeType: NodeType, 
+    options: CompilerOptions
+): Array<SerializedNode> | null {
+    if (nodeType === 'text') {
+        return null;
+    }
+
+    return Array.from(node.childNodes).reduce<Array<SerializedNode>>((children, child) => {
+        const childNode = serializeNode(<Element> child, options);
+
+        // skip entirely empty text nodes if we're trimming whitespace
+        if (options.trimWhitespace && childNode.nodeType === 'text' && childNode.textContent === '') {
+            return children;
+        }
+
+        return children.concat(childNode);
+    }, []);
 }
 
 /**
@@ -32,7 +61,7 @@ function getNodeType(node: Element): NodeType {
 /**
  * Get the root element of our template.
  * 
- * @param  {string}     source  raw source code
+ * @param  {string}             source      raw source code
  * @return {Element}
  */
 function getRootElement(source: string): Element {
@@ -53,20 +82,49 @@ function getRootElement(source: string): Element {
 }
 
 /**
+ * Get an element's tag name.
+ * 
+ * @param  {Element}        node 
+ * @param  {NodeType}       nodeType
+ * @return {string|null}
+ */
+function getTagName(node: Element, nodeType: NodeType): string | null {
+    return nodeType === 'element' ? node.tagName.toLowerCase() : null;
+}
+
+/**
+ * Get the text content of a node.
+ * 
+ * @param  {Element}            node 
+ * @param  {NodeType}           nodeType
+ * @param  {CompilerOptions}    options
+ * @return {string|null}
+ */
+function getTextContent(node: Element, nodeType: NodeType, options: CompilerOptions): string | null {
+    if (nodeType !== 'text' || node.textContent === null) {
+        return null;
+    }
+    
+    return options.trimWhitespace 
+        ? node.textContent.trim() 
+        : node.textContent;
+}
+
+/**
  * Serialize a dom node and all of it's children.
  * 
- * @param  {Element}    el  the element being serialized
+ * @param  {Element}            el          the element being serialized
+ * @param  {CompilerOptions}    options     compiler options
  * @return {Object}
  */
-function serializeNode(node: Element): SerializedNode {
+function serializeNode(node: Element, options: CompilerOptions): SerializedNode {
     const nodeType = getNodeType(node);
-    const tagName = nodeType === 'element' ? node.tagName.toLowerCase() : null;
-    const textContent = nodeType === 'text' ? node.textContent : null;
+    const children = getChildNodes(node, nodeType, options);
+    const tagName = getTagName(node, nodeType);
+    const textContent = getTextContent(node, nodeType, options);
 
     return {
-        children: nodeType === 'element'
-            ? Array.from(node.childNodes).map(child => serializeNode(<Element> child))
-            : null,
+        children,
         nodeType,
         tagName,
         textContent,
