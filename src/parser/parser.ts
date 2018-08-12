@@ -1,6 +1,11 @@
 import { JSDOM } from 'jsdom';
 import { Node } from 'highlight.js';
-import { CompilerOptions, NodeType, SerializedNode } from '../types';
+import { 
+    CompilerOptions, 
+    NodeStaticAttrs,
+    NodeType, 
+    SerializedNode,
+} from '../types';
 
 /**
  * Parse source code into an abstract syntax tree
@@ -80,6 +85,28 @@ function getRootElement(source: string): Element {
 
     return rootElement;
 }
+/**
+ * Get an element's static attributes.
+ * 
+ * @param  {Element}            node 
+ * @param  {NodeType}           nodeType
+ * @return {NodeStaticAttrs}
+ */
+function getStaticAttrs(node: Element, nodeType: NodeType): NodeStaticAttrs | null {
+    if (nodeType !== 'element') {
+        return null;
+    }
+
+    return Array.from(node.attributes).reduce<NodeStaticAttrs>((staticAttrs, attr) => {
+        const name = String(attr.localName);
+
+        if (!name.startsWith('v-') && !name.startsWith(':')) {
+            staticAttrs[name] = attr.value;
+        }
+
+        return staticAttrs;
+    }, {});
+}
 
 /**
  * Get an element's tag name.
@@ -119,14 +146,12 @@ function getTextContent(node: Element, nodeType: NodeType, options: CompilerOpti
  */
 function serializeNode(node: Element, options: CompilerOptions): SerializedNode {
     const nodeType = getNodeType(node);
-    const children = getChildNodes(node, nodeType, options);
-    const tagName = getTagName(node, nodeType);
-    const textContent = getTextContent(node, nodeType, options);
 
     return {
-        children,
+        children: getChildNodes(node, nodeType, options),
         nodeType,
-        tagName,
-        textContent,
+        staticAttrs: getStaticAttrs(node, nodeType),
+        tagName: getTagName(node, nodeType),
+        textContent: getTextContent(node, nodeType, options),
     };
 }

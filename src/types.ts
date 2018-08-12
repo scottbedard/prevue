@@ -3,6 +3,11 @@ export interface CompilerOptions {
     trimWhitespace?: boolean,
 }
 
+// static node attributes
+export interface NodeStaticAttrs {
+    [key: string]: string
+}
+
 // the various types of elements that can be serialized
 export type NodeType = 'element' | 'text' | 'unknown';
 
@@ -11,6 +16,7 @@ export type NodeType = 'element' | 'text' | 'unknown';
 export interface SerializedNode {
     children: Array<SerializedNode> | null,
     nodeType: NodeType,
+    staticAttrs: NodeStaticAttrs | null,
     tagName: string | null,
     textContent: string | null,
 }
