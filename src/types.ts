@@ -1,5 +1,7 @@
 // compilation options
 export interface CompilerOptions {
+    cleanOutput?: boolean,
+    name: string,
     trimWhitespace?: boolean,
 }
 

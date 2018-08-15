@@ -7,11 +7,16 @@ describe('parser', function () {
     fs.readdirSync(path.resolve(__dirname, './parser'))
         .forEach(dir => {
             it(dir, function () {
-                const { expected, options, test } = require(path.resolve(__dirname, './parser', dir, './test.ts'));
+                const { expected, options, test } = require(path.resolve(__dirname, './parser', dir, './test.js'));
                 const source = fs.readFileSync(path.resolve(__dirname, './parser', dir, './component.vue'), 'utf8');
 
                 // create a compiler for the component
-                const compiler = new Compiler(source, options || {});
+                const compiler = new Compiler(source, {
+                    name: 'Component',
+                    ...(options || {}),
+                });
+
+                compiler.parse();
 
                 // assert that our output matches the expected output
                 expect(compiler.parsedSource).toMatchObject(expected);

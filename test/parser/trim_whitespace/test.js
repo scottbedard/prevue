@@ -1,8 +1,8 @@
-export const options = {
+module.exports.options = {
     trimWhitespace: true,
 }
 
-export const expected = {
+module.exports.expected = {
     template: {
         "children": [
             {

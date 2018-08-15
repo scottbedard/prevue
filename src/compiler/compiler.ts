@@ -5,7 +5,11 @@ import {
 } from '../types';
 
 import { parse } from '../parser/parser';
+import ComponentConstructor from './code/component_constructor';
 
+/**
+ * Compiler.
+ */
 export default class Compiler
 {
     /**
@@ -16,7 +20,7 @@ export default class Compiler
     /**
      * @var parsedSource
      */
-    parsedSource: ParsedSource;
+    parsedSource: ParsedSource | null = null;
 
     /**
      * @var source
@@ -32,7 +36,6 @@ export default class Compiler
     constructor(source: string, options: CompilerOptions) {
         this.options = options;
         this.source = source;
-        this.parsedSource = parse(this.source, this.options);
     }
 
     /**
@@ -41,12 +44,32 @@ export default class Compiler
      * @return  {CompilerOutput}
      */
     compile(): CompilerOutput {
-        const code = `
-            console.log('oh yeaaaaa');
-        `;
-
+        const code = this.generateCode();
+        
         return {
             code,
         }
+    }
+
+    /**
+     * Generate prevue code.
+     * 
+     * @return {string}
+     */
+    generateCode(): string {
+        const componentConstructor = new ComponentConstructor(this);
+
+        return [
+            componentConstructor.getProcessedCode(),
+        ].join('\n\n');
+    }
+
+    /**
+     * Parse source code.
+     * 
+     * @return {void}
+     */
+    parse(): void {
+        this.parsedSource = parse(this.source, this.options);
     }
 }

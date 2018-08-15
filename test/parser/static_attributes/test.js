@@ -1,4 +1,4 @@
-export const expected = {
+module.exports.expected = {
     "template": {
         "children": [],
         "nodeType": "element",
@@ -11,6 +11,6 @@ export const expected = {
     }
 }
 
-export function test(output) {
+module.exports.test = function(output) {
     expect(Object.keys(output.template.staticAttrs).length).toBe(2);
 }
