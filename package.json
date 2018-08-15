@@ -23,8 +23,8 @@
     "prebuild": "rimraf dist",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest --env=jsdom",
+    "test:watch": "jest --env=jsdom --watch",
     "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
     "precommit": "lint-staged"
   },

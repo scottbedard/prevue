@@ -1,5 +1,6 @@
 import { 
     CompilerOptions,
+    CompilerOutput,
     ParsedSource,
 } from '../types';
 
@@ -37,9 +38,15 @@ export default class Compiler
     /**
      * Compile to javascript.
      * 
-     * @return {string}
+     * @return  {CompilerOutput}
      */
-    compile() {
-        console.log ('compiling!');
+    compile(): CompilerOutput {
+        const code = `
+            console.log('oh yeaaaaa');
+        `;
+
+        return {
+            code,
+        }
     }
 }

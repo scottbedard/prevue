@@ -3,6 +3,11 @@ export interface CompilerOptions {
     trimWhitespace?: boolean,
 }
 
+// compilation output
+export interface CompilerOutput {
+    code: string,
+}
+
 // static node attributes
 export interface NodeStaticAttrs {
     [key: string]: string

@@ -9,4 +9,10 @@ import Compiler from './compiler/compiler';
  */
 export function compile(source: string, options: any) {
     const compiler = new Compiler(source, options);
+
+    const code = compiler.compile();
+
+    return {
+        code,
+    }
 }
