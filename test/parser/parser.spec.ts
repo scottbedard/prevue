@@ -10,10 +10,14 @@ describe('parser', function () {
             it(dir, function () {
                 const { expected, options, test } = require(path.resolve(__dirname, dir, './test.ts'));
                 const source = fs.readFileSync(path.resolve(__dirname, dir, './component.vue'), 'utf8');
+
+                // create a compiler for the component
                 const compiler = new Compiler(source, options || {});
 
+                // assert that our output matches the expected output
                 expect(compiler.parsedSource).toMatchObject(expected);
 
+                // call a test function if one was provided
                 if (typeof test === 'function') {
                     test(compiler.parsedSource);
                 }
