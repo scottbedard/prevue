@@ -1,4 +1,8 @@
-export default {
+export const options = {
+    trimWhitespace: true,
+}
+
+export const expected = {
     template: {
         "children": [
             {

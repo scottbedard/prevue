@@ -31,7 +31,7 @@ export default class Compiler
     constructor(source: string, options: CompilerOptions) {
         this.options = options;
         this.source = source;
-        this.parsedSource = parse(source);
+        this.parsedSource = parse(this.source, this.options);
     }
 
     /**

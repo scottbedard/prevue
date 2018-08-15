@@ -1,4 +1,4 @@
-export default {
+export const expected = {
     "template": {
         "children": [],
         "nodeType": "element",
@@ -9,4 +9,8 @@ export default {
         "tagName": "div",
         "textContent": null
     }
+}
+
+export function test(output) {
+    expect(Object.keys(output.template.staticAttrs).length).toBe(2);
 }

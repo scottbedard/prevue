@@ -1,12 +1,12 @@
 <!--
     only the "one" and "three" attrs should be part of staticAttrs.
-    "v-foo" and ":hello" should be ignored because they are not static.
+    "v-bind:foo" and ":bar" should be ignored because they are not static.
 -->
 
 <template>
     <div 
-        v-foo="bar" 
-        :hello="world"
+        v-bind:foo="1" 
+        :bar="2"
         one="two" 
         three="four" 
     ></div>
