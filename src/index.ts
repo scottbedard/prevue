@@ -1,3 +1,5 @@
+import Compiler from './compiler/compiler';
+
 /**
  * Compile source code into a component.
  * 
@@ -6,5 +8,5 @@
  * @return {void}
  */
 export function compile(source: string, options: any) {
-    // ...
+    const compiler = new Compiler(source, options);
 }

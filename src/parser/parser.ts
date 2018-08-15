@@ -4,6 +4,7 @@ import {
     CompilerOptions, 
     NodeStaticAttrs,
     NodeType, 
+    ParsedSource,
     SerializedNode,
 } from '../types';
 
@@ -13,7 +14,7 @@ import {
  * @param  {string} source  raw source code to parse  
  * @return {Object} 
  */
-export function parse(source: string, options: CompilerOptions = {}) {
+export function parse(source: string, options: CompilerOptions = {}): ParsedSource {
     const rootElement = getRootElement(source);
     const template = serializeNode(rootElement, options);
 
