@@ -8,7 +8,7 @@ import Compiler from './compiler/compiler';
  * @return {void}
  */
 export function compile(source: string, options: any) {
-    const compiler = new Compiler(source, options);
+    const compiler = new Compiler(options, source);
 
     const code = compiler.compile();
 

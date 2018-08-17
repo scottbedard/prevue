@@ -5,7 +5,7 @@ import {
 } from '../types';
 
 import { parse } from '../parser/parser';
-import ComponentConstructor from './code/component_constructor';
+import code from './code';
 
 /**
  * Compiler.
@@ -33,7 +33,7 @@ export default class Compiler
      * @param {string}          source
      * @param {CompilerOptions} options     
      */
-    constructor(source: string, options: CompilerOptions) {
+    constructor(options: CompilerOptions, source: string = '') {
         this.options = options;
         this.source = source;
     }
@@ -56,12 +56,10 @@ export default class Compiler
      * 
      * @return {string}
      */
-    generateCode(): string {
-        const componentConstructor = new ComponentConstructor(this);
-
-        return [
-            componentConstructor.getProcessedCode(),
-        ].join('\n\n');
+    generateCode(): any {
+        return code(`
+            'use strict';
+        `);
     }
 
     /**

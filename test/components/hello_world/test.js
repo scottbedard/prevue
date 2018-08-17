@@ -1,3 +1,3 @@
-module.exports.test = function({ code }) {
-    // console.log('code', code);
+module.exports.test = function(output) {
+    // console.log (output);
 }

@@ -24,7 +24,7 @@
     "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --env=jsdom",
-    "test:watch": "jest --env=jsdom --watch",
+    "test:watch": "jest --env=node --watch",
     "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
     "precommit": "lint-staged"
   },
@@ -36,7 +36,7 @@
   },
   "jest": {
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "ts-jest"
     },
     "testEnvironment": "node",
     "testRegex": "(/__tests__/.*|\\.(spec))\\.(ts|tsx|js)$",
