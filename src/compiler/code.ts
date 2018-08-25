@@ -1,5 +1,4 @@
 import Compiler from './compiler';
-import { partials } from 'handlebars';
 
 interface Helpers {
     [key: string]: Code,
