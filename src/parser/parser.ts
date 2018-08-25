@@ -6,6 +6,7 @@ import {
     NodeType, 
     ParsedSource,
     SerializedNode,
+    NodeDynamicAttrs,
 } from '../types';
 
 /**
@@ -14,7 +15,7 @@ import {
  * @param  {string} source  raw source code to parse  
  * @return {Object} 
  */
-export function parse(source: string, options: CompilerOptions = {}): ParsedSource {
+export function parse(source: string, options: CompilerOptions): ParsedSource {
     const rootElement = getRootElement(source);
     const template = serializeNode(rootElement, options);
 
@@ -50,6 +51,33 @@ function getChildNodes(
 
         return children.concat(childNode);
     }, []);
+}
+
+/**
+ * Get an element's dynamic attributes.
+ * 
+ * @param  {Element}            node
+ * @return {NodeDynamicAttrs}
+ */
+function getDynamicAttrs(node: Element, nodeType: NodeType, options: CompilerOptions): NodeDynamicAttrs {
+    if (nodeType !== 'element') {
+        return {};
+    }
+        
+    return Array.from(node.attributes)
+        .filter(attr => attr.localName && (attr.localName.startsWith('v-bind') || attr.localName.startsWith(':')))
+        .reduce((result, attr) => {
+            const rawName = attr.localName || '';
+            const rawValue = attr.value;
+            const name = rawName.slice(rawName.indexOf(':') + 1);
+
+            return {
+                ...result,
+                [name]: {
+                    rawValue,
+                },
+            }
+        }, {});
 }
 
 /**
@@ -150,6 +178,7 @@ function serializeNode(node: Element, options: CompilerOptions): SerializedNode 
 
     return {
         children: getChildNodes(node, nodeType, options),
+        dynamicAttrs: getDynamicAttrs(node, nodeType, options),
         nodeType,
         staticAttrs: getStaticAttrs(node, nodeType),
         tagName: getTagName(node, nodeType),

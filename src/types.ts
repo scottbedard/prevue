@@ -10,6 +10,14 @@ export interface CompilerOutput {
     code: string,
 }
 
+// dynamic node attributes
+export interface NodeDynamicAttrs {
+    [key: string]: {
+        // @todo: flesh this out
+        rawValue: string,
+    },
+}
+
 // static node attributes
 export interface NodeStaticAttrs {
     [key: string]: string
@@ -27,6 +35,7 @@ export interface ParsedSource {
 // template. this interfaces represents the shape of thot serialization.
 export interface SerializedNode {
     children: Array<SerializedNode> | null,
+    dynamicAttrs: NodeDynamicAttrs,
     nodeType: NodeType,
     staticAttrs: NodeStaticAttrs | null,
     tagName: string | null,
