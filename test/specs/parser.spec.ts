@@ -1,15 +1,17 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import Compiler from '../src/compiler/compiler';
+import Compiler from '../../src/compiler/compiler';
 import { expect } from 'chai';
-import { ParsedSource } from '../src/types';
+import { ParsedSource } from '../../src/types';
 
+//
+// specs
+//
 describe('parser', () => {
     const parserDir = path.resolve(__dirname, 'parser');
 
     fs.readdirSync(parserDir).forEach(file => {
         const source = fs.readFileSync(path.resolve(__dirname, './parser', file, './component.vue'), 'utf8');
-
         const test = require(path.resolve(__dirname, './parser', file, './test.ts'));
 
         const testFn = function () {

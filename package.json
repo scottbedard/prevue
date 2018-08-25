@@ -25,7 +25,7 @@
     "start": "rollup -c rollup.config.ts -w",
     "pretest": "tsc",
     "test": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.spec.ts",
-    "test:watch": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.ts --watch --watch-extensions ts",
+    "test:watch": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.ts --watch",
     "prepare": "tsc",
     "precommit": "lint-staged"
   },
