@@ -24,7 +24,7 @@
     "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
     "pretest": "tsc",
-    "test": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.spec.ts",
+    "test": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.ts",
     "test:watch": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.ts --watch",
     "prepare": "tsc",
     "precommit": "lint-staged"
