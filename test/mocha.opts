@@ -1,5 +1,2 @@
---ui mocha-typescript
---require source-map-support/register
---require ts-node/register
---watch-extensions ts
-test/**/*.ts
+test/init.ts
+test/**/*.spec.ts
