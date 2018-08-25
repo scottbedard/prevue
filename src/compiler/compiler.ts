@@ -48,6 +48,7 @@ export default class Compiler
             :fragments
 
             return function ${options.name}() {
+                console.log('hooray');
                 // ...
             }
         `);

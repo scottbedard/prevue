@@ -16,6 +16,7 @@ describe('components', () => {
             // compile our component to a function
             const compiler = new Compiler({
                 cleanOutput: true,
+                format: 'fn',
                 name: 'Component',
                 ...(test.options || {}),
             }, source);
@@ -23,7 +24,7 @@ describe('components', () => {
             const output = compiler.compile();
 
             if (typeof test.test === 'function') {
-                test.test(output);
+                test.test(output, new Function(output.code)());
             }
         }
 

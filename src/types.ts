@@ -1,6 +1,7 @@
 // compilation options
 export interface CompilerOptions {
     cleanOutput?: boolean,
+    format: 'fn',
     name: string,
     trimWhitespace?: boolean,
 }
@@ -8,6 +9,11 @@ export interface CompilerOptions {
 // compilation output
 export interface CompilerOutput {
     code: string,
+}
+
+// constructable types
+export interface Constructable<T> {
+    new() : T;
 }
 
 // dynamic node attributes

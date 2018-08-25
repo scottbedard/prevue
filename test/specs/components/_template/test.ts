@@ -1,3 +1,5 @@
+import { CompilerOutput } from '../../../../src/types';
+
 //
 // only
 //
@@ -16,6 +18,6 @@ export const skip = false;
 //
 // test
 //
-export function test(output: string) {
-    // ...
+export function test(output: CompilerOutput, Component: any) {
+    
 }
