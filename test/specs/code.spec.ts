@@ -71,4 +71,23 @@ describe('code generation', function () {
 
         expect(foo.toString()).to.equal(`function someHelper() {}\n\nfunction someOtherHelper() {}\n\n// foo\n// bar`)
     });
+
+    it('registers partial resolvers', function () {
+        const code = new Code(`
+            if (true) {
+                :hello
+            }
+        `);
+
+        code.registerDynamicPartial('hello', (c) => {
+            expect(c).to.equal(code);
+
+            return `
+                // line 1
+                // line 2
+            `
+        });
+
+        expect(code.toString()).to.equal(`if (true) {\n    // line 1\n    // line 2\n}`);
+    });
 });

@@ -1,5 +1,11 @@
 import Compiler from './compiler';
 
+type DynamicPartialResolver = (code?: Code) => Code | string;
+
+interface DynamicPartials {
+    [key: string]: DynamicPartialResolver,
+}
+
 interface Helpers {
     [key: string]: Code,
 }
@@ -13,6 +19,10 @@ interface Partials {
  */
 export default class Code 
 {
+    /**
+     * @var {DynamicPartials} dynamicPartials
+     */
+    dynamicPartials: DynamicPartials = {};
 
     /**
      * @var {Helpers} helpers
@@ -69,6 +79,14 @@ export default class Code
     }
 
     /**
+     * Register a dynamic partial
+     * @param name 
+     */
+    public registerDynamicPartial(name: string, resolver: DynamicPartialResolver) {
+        this.dynamicPartials[name] = resolver;
+    }
+
+    /**
      * Register a helper.
      * 
      * @param  {string}         name
@@ -117,15 +135,26 @@ export default class Code
         }
 
         // replace partials
-        output = output.replace(/\:\w+/g, (partial, offset) => {
+        output = output.replace(/\:\w+/g, (partial, offset): string => {
             const name = partial.slice(1);
             const indentation = indentationAtOffset(output, offset);
-    
+            const applyLineIndentation = (ln: string, i: number) => i === 0 ? ln : indentation + ln;
+            
+            // dynamic partials
+            if (typeof this.dynamicPartials[name] !== 'undefined') {
+                return getDynamicPartial(this, name)
+                    .toString()
+                    .split('\n')
+                    .map(applyLineIndentation)
+                    .join('\n');
+            }
+            
+            // default partial resolution
             return this.partials[name]
                 .map(code => {
                     return code.toString()
                         .split('\n')
-                        .map((ln, i) => i === 0 ? ln : indentation + ln)
+                        .map(applyLineIndentation)
                         .join('\n')
                 })
                 .join('\n');
@@ -170,6 +199,19 @@ function findPartials(code: Code): Partials {
  */
 function getCodeFromContent(content: Code | string): Code {
     return typeof content === 'string' ? new Code(cleanWhitespace(content)) : content;
+}
+
+/**
+ * Resolve a dynamid partial.
+ * 
+ * @param  {Code}   code 
+ * @param  {string} name
+ * @return {Code} 
+ */
+function getDynamicPartial(code: Code, name: string): Code {
+    const content = code.dynamicPartials[name](code);
+
+    return typeof content === 'string' ? new Code(content): content;
 }
 
 /**
