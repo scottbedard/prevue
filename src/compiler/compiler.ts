@@ -45,8 +45,6 @@ export default class Compiler
         this.code = new Code(`
             'use strict';
 
-            :helpers
-
             :fragments
 
             return function ${options.name}() {
