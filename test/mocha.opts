@@ -1,0 +1,3 @@
+--watch-extensions ts
+test/init.ts
+test/**/*.spec.ts
