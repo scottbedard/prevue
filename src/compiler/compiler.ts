@@ -5,13 +5,18 @@ import {
 } from '../types';
 
 import { parse } from '../parser/parser';
-import code from './code';
+import Code from './code';
 
 /**
  * Compiler.
  */
 export default class Compiler
 {
+    /**
+     * @var  {Code}     code
+     */
+    code: Code;
+
     /**
      * @var options
      */
@@ -36,6 +41,18 @@ export default class Compiler
     constructor(options: CompilerOptions, source: string = '') {
         this.options = options;
         this.source = source;
+
+        this.code = new Code(`
+            'use strict';
+
+            :helpers
+
+            :fragments
+
+            return function ${options.name}() {
+                // ...
+            }
+        `);
     }
 
     /**
@@ -44,22 +61,9 @@ export default class Compiler
      * @return  {CompilerOutput}
      */
     compile(): CompilerOutput {
-        const code = this.generateCode();
-        
         return {
-            code,
+            code: this.code.toString(),
         }
-    }
-
-    /**
-     * Generate prevue code.
-     * 
-     * @return {string}
-     */
-    generateCode(): any {
-        return code(`
-            'use strict';
-        `);
     }
 
     /**

@@ -1,35 +1,143 @@
 import Compiler from './compiler';
+import { partials } from 'handlebars';
+
+interface Helpers {
+    [key: string]: Code,
+}
 
 interface Partials {
-    [key: string]: string,
+    [key: string]: Array<Code>,
 }
 
 /**
  * Compose code.
  * 
  * @param  {source}     source      outer source code
- * @param  {Partials}   partials    code to inject as a partial 
  * @return {string}
  */
-export default function code(src: string, partials: Partials = {}): string {
-    src = cleanWhitespate(src);
+export default class Code 
+{
 
-    // search for partials in our code
-    return src.replace(/\:\w+/g, (partial, offset) => {
-        const name = partial.slice(1);
+    /**
+     * @var {Helpers} helpers
+     */
+    helpers: Helpers = {};
 
-        // throw an error if we find one that is not registered
-        if (typeof partials[name] === 'undefined') {
-            throw new Error(`Partial "${name} not found.`);
+    /**
+     * @var {Code|null} parent
+     */
+    parent: Code | null = null;
+
+    /**
+     * @var {Partials} partials
+     */
+    partials: Partials = {};
+
+    /**
+     * @var {string} src
+     */
+    src: string;
+
+    /**
+     * Constructor.
+     * 
+     * @param  {string}     src 
+     * @param  {Partials}   partials
+     */
+    constructor(src: string) {
+        this.src = src;
+        this.partials = findPartials(this);
+    }
+
+    /**
+     * Append code to a partial.
+     * 
+     * @param  {string}         target
+     * @param  {Code|string}    content 
+     * @return {void}
+     */
+    public append(content: Code|string, target: string): void {
+        const code = getCodeFromContent(content);
+
+        code.parent = this;
+
+        this.partials[target].push(code);
+    }
+
+    /**
+     * Determine if this is the root code instance.
+     * 
+     * @return {boolean}
+     */
+    public isRoot(): boolean {
+        return this === this.root;
+    }
+
+    /**
+     * Register a helper.
+     * 
+     * @param  {string}         name
+     * @param  {Code|string}    content
+     * @return {void} 
+     */
+    public registerHelper(name: string, content: Code|string): void {
+        const helper = getCodeFromContent(content);
+        const root = this.root;
+        
+        root.helpers = {
+            ...root.helpers,
+            [name]: helper,
+        }
+    }
+
+    /**
+     * Get the root code instance.
+     * 
+     * @return {Code|null}
+     */
+    get root(): Code {
+        let level: Code = this;
+
+        while (level.parent) {
+            level = level.parent;
         }
 
-        // otherwise indent and insert it
-        const indentation = indentationAtOffset(src, offset);
+        return level;
+    }
 
-        return partials[name].split('\n')
-            .map((ln, i) => i === 0 ? ln : indentation + ln)
-            .join('\n')
-    });
+    /**
+     * Cast to a string.
+     * 
+     * @return {string}
+     */
+    public toString(): string {
+        let output: string = cleanWhitespace(this.src);
+
+        // prepend helpers
+        if (this.isRoot()) {
+            output = Object.keys(this.helpers)
+                .map<Code|string>(name => this.helpers[name])
+                .concat(output)
+                .join('\n\n');
+        }
+
+        // replace partials
+        output = output.replace(/\:\w+/g, (partial, offset) => {
+            const name = partial.slice(1);
+            const indentation = indentationAtOffset(output, offset);
+    
+            return this.partials[name]
+                .map(code => {
+                    return code.toString()
+                        .split('\n')
+                        .map((ln, i) => i === 0 ? ln : indentation + ln)
+                        .join('\n')
+                })
+                .join('\n');
+        });
+
+        return output.replace(/\n\n\n+/g, '\n\n').trim();
+    }
 }
 
 /**
@@ -38,7 +146,7 @@ export default function code(src: string, partials: Partials = {}): string {
 * @param  {string}     src
 * @return {string} 
 */
-function cleanWhitespate(src: string): string {
+function cleanWhitespace(src: string): string {
     let lines = src.split('\n');
 
     while (isIndented(lines)) {
@@ -46,6 +154,27 @@ function cleanWhitespate(src: string): string {
     }
 
     return lines.join('\n').trim();
+}
+
+/**
+ * Find the partials in a piece of code.
+ * 
+ * @param  {Code}   code 
+ */
+function findPartials(code: Code): Partials {
+    return (code.src.match(/\:\w+/g) || []).reduce((partials, partial) => {
+        return { ...partials, [partial.slice(1)]: [] }
+    }, {});
+}
+
+/**
+ * Get a code instance.
+ * 
+ * @param  {Code|string}    content
+ * @return {Code} 
+ */
+function getCodeFromContent(content: Code | string): Code {
+    return typeof content === 'string' ? new Code(cleanWhitespace(content)) : content;
 }
 
 /**
