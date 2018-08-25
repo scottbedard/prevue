@@ -9,10 +9,7 @@ interface Partials {
 }
 
 /**
- * Compose code.
- * 
- * @param  {source}     source      outer source code
- * @return {string}
+ * Compose code
  */
 export default class Code 
 {
@@ -41,7 +38,6 @@ export default class Code
      * Constructor.
      * 
      * @param  {string}     src 
-     * @param  {Partials}   partials
      */
     constructor(src: string) {
         this.src = src;

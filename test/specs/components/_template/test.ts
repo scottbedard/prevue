@@ -13,11 +13,11 @@ export const options = {};
 //
 // skip
 //
-export const skip = false;
+export const skip = true;
 
 //
 // test
 //
 export function test(output: CompilerOutput, Component: any) {
-    
+    console.log(output.code);
 }

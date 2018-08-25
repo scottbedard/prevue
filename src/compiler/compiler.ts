@@ -6,6 +6,7 @@ import {
 
 import { parse } from '../parser/parser';
 import Code from './code';
+import Fragment from './fragment';
 
 /**
  * Compiler.
@@ -43,15 +44,18 @@ export default class Compiler
         this.source = source;
 
         this.code = new Code(`
-            'use strict';
-
             :fragments
 
             return function ${options.name}() {
-                console.log('hooray');
-                // ...
+                var f = createMainFragment();
             }
         `);
+
+        const createMainFragment = new Fragment;
+
+        this.code.append(createMainFragment, 'fragments');
+        
+        this.code.registerHelper('noop', 'function noop(){}');
     }
 
     /**
