@@ -1,0 +1,16 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "outDir": "build/",
+      "skipLibCheck": true
+    },
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "test/**/*.test.ts",
+      "test/**/*.tsx",
+      "types/**/*.d.ts"
+    ]
+  }
