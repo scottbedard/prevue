@@ -4,6 +4,9 @@ module.exports.expected = {
             foo: {
                 rawValue: '1',
             },
+            bar: {
+                rawValue: '2',
+            },
         },
     },
 };
