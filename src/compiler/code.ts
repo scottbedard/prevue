@@ -49,7 +49,7 @@ export default class Code
      * 
      * @param  {string}     src 
      */
-    constructor(src: string) {
+    constructor(src: string = '') {
         this.src = src;
         this.partials = findPartials(this);
     }
@@ -70,12 +70,30 @@ export default class Code
     }
 
     /**
+     * 
+     * @param name 
+     */
+    public generateNamedIdentifier(name: string): string {
+        return name;
+    }
+
+    /**
      * Determine if this is the root code instance.
      * 
      * @return {boolean}
      */
     public isRoot(): boolean {
         return this === this.root;
+    }
+
+    /**
+     * Determine if a partial is empty.
+     * 
+     * @param  {string}     name
+     * @return {boolean}
+     */
+    public partialIsEmpty(name: string): boolean {
+        return Array.isArray(this.partials[name]) && this.partials[name].length === 0;
     }
 
     /**
@@ -134,6 +152,11 @@ export default class Code
                 .join('\n\n');
         }
 
+        // replace named identifiers
+        output = output.replace(/\$\w+/g, (partial, offset) => {
+            return this.generateNamedIdentifier(partial.slice(1));
+        });
+
         // replace partials
         output = output.replace(/\:\w+/g, (partial, offset): string => {
             const name = partial.slice(1);
@@ -186,9 +209,12 @@ function cleanWhitespace(src: string): string {
  * @param  {Code}   code 
  */
 function findPartials(code: Code): Partials {
-    return (code.src.match(/\:\w+/g) || []).reduce((partials, partial) => {
+    const partials = (code.src.match(/\:\w+/g) || []).reduce((partials, partial) => {
         return { ...partials, [partial.slice(1)]: [] }
     }, {});
+    
+
+    return partials;
 }
 
 /**

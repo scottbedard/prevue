@@ -24,8 +24,8 @@
     "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
     "pretest": "tsc",
-    "test": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.ts",
-    "test:watch": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.ts --watch",
+    "test": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.spec.ts",
+    "test:watch": "mocha --opts test/mocha.opts -r ts-node/register test/**/*.spec.ts --watch",
     "prepare": "tsc",
     "precommit": "lint-staged"
   },

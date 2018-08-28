@@ -16,6 +16,12 @@ describe('code generation', function () {
         expect(code.toString()).to.equal(`if (foo) {\n    return true;\n}`);
     });
 
+    it.skip('can append code to partials', function () {
+        const code = new Code(`
+            :whatever
+        `);
+    });
+
     it('appends to partials', function () {
         const code = new Code(`
             if (foo) {
@@ -57,6 +63,20 @@ describe('code generation', function () {
         expect(baz.parent).to.equal(bar);
     });
 
+    it('exposes an "partialIsEmpty" helper', function () {
+        const code = new Code(`
+            :somePartial
+        `);
+
+        expect(code.partialIsEmpty('somePartial')).to.be.true;
+
+        code.append(`
+            // whatever
+        `, 'somePartial');
+
+        expect(code.partialIsEmpty('somePartial')).to.be.false;
+    }); 
+
     it('register helper functions', function () {
         const foo = new Code(`
             // foo
@@ -89,5 +109,18 @@ describe('code generation', function () {
         });
 
         expect(code.toString()).to.equal(`if (true) {\n    // line 1\n    // line 2\n}`);
+    });
+
+    it.skip('generates unique names for identifiers', function () {
+        const parent = new Code(`
+            // parent $foo
+            :children
+        `);
+
+        const child = new Code(`
+            // child $foo
+        `);
+
+        parent.append(child, 'children');
     });
 });
