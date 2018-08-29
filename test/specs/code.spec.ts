@@ -16,12 +16,6 @@ describe('code generation', function () {
         expect(code.toString()).to.equal(`if (foo) {\n    return true;\n}`);
     });
 
-    it.skip('can append code to partials', function () {
-        const code = new Code(`
-            :whatever
-        `);
-    });
-
     it('appends to partials', function () {
         const code = new Code(`
             if (foo) {
@@ -32,11 +26,10 @@ describe('code generation', function () {
         expect(code.partials).to.deep.equal({ bar: [] });
 
         code.append(`
-            // hello world
-            return true;
+            // bar
         `, 'bar');
 
-        expect(code.toString()).to.equal(`if (foo) {\n    // hello world\n    return true;\n}`);
+        expect(code.toString()).to.equal(`if (foo) {\n    // bar\n}`);
     });
 
     it('computes hierarchical parent relationships', function () {
@@ -77,21 +70,6 @@ describe('code generation', function () {
         expect(code.partialIsEmpty('somePartial')).to.be.false;
     }); 
 
-    it('register helper functions', function () {
-        const foo = new Code(`
-            // foo
-            :children
-        `);
-
-        const bar = new Code(`// bar`);
-
-        foo.append(bar, 'children');
-        foo.registerHelper('someHelper', `function someHelper() {}`);
-        bar.registerHelper('someOtherHelper', `function someOtherHelper() {}`);
-
-        expect(foo.toString()).to.equal(`function someHelper() {}\n\nfunction someOtherHelper() {}\n\n// foo\n// bar`)
-    });
-
     it('registers partial resolvers', function () {
         const code = new Code(`
             if (true) {
@@ -123,4 +101,20 @@ describe('code generation', function () {
 
         parent.append(child, 'children');
     });
+
+    it('can be rendered with helpers', function () {
+        const parent = new Code(`
+            if (true) {
+                :children
+            }
+        `);
+
+        const noop = parent.registerHelper('noop');
+
+        parent.append(`
+            ${noop}();
+        `, 'children');
+
+        expect(parent.render()).to.equal(`function noop(){}\n\nif (true) {\n    noop();\n}`)
+    })
 });

@@ -55,7 +55,7 @@ export default class Fragment extends Code
     }
 
     /**
-     * Get a lifecycle partial, or noop if there is no content.
+     * Returns a lifecycle partial, or noop if there is no content.
      * 
      * @param  {string}     name
      */

@@ -1,13 +1,10 @@
 import Compiler from './compiler';
+import helpers from './helpers';
 
 type DynamicPartialResolver = (code?: Code) => Code | string;
 
 interface DynamicPartials {
     [key: string]: DynamicPartialResolver,
-}
-
-interface Helpers {
-    [key: string]: Code,
 }
 
 interface Partials {
@@ -27,7 +24,7 @@ export default class Code
     /**
      * @var {Helpers} helpers
      */
-    helpers: Helpers = {};
+    helpers: Array<string> = [];
 
     /**
      * @var {Code|null} parent
@@ -61,12 +58,17 @@ export default class Code
      * @param  {Code|string}    content 
      * @return {void}
      */
-    public append(content: Code|string, target: string): void {
+    public append(content: Code|string, partial: string): void {
+        // throw an error if the partial doesn't exist
+        if (!this.hasPartial(partial)) {
+            throw new Error(`Failed to append to "${partial}", partial not found.`);
+        }
+
         const code = getCodeFromContent(content);
 
         code.parent = this;
 
-        this.partials[target].push(code);
+        this.partials[partial].push(code);
     }
 
     /**
@@ -75,6 +77,16 @@ export default class Code
      */
     public generateNamedIdentifier(name: string): string {
         return name;
+    }
+
+    /**
+     * Determine if a partial exists.
+     * 
+     * @param  {string}     name    the name of the partial
+     * @return {boolean}
+     */
+    public hasPartial(name: string): boolean {
+        return typeof this.partials[name] !== 'undefined';
     }
 
     /**
@@ -107,18 +119,19 @@ export default class Code
     /**
      * Register a helper.
      * 
-     * @param  {string}         name
-     * @param  {Code|string}    content
-     * @return {void} 
+     * @param  {string} name
+     * @return {string}
      */
-    public registerHelper(name: string, content: Code|string): void {
-        const helper = getCodeFromContent(content);
-        const root = this.root;
-        
-        root.helpers = {
-            ...root.helpers,
-            [name]: helper,
+    public registerHelper(name: string): string {
+        if (typeof helpers[name] === 'undefined') {
+            throw new Error(`Failed to register helper "${name}", function not found.`);
         }
+
+        const root = this.root;
+
+        root.helpers.push(name);
+        
+        return root.generateNamedIdentifier(name);
     }
 
     /**
@@ -137,20 +150,46 @@ export default class Code
     }
 
     /**
+     * Render a code tree from the root down.
+     * 
+     * @return {string}
+     */
+    public render(): string {
+        return this.isRoot 
+            ? this.renderSubtree() 
+            : this.root.renderSubtree();
+    }
+
+    /**
+     * Render a code free from this instance down.
+     * 
+     * @return {string}
+     */
+    public renderSubtree(): string {
+        const root = this.root;
+        let output = this.toString();
+        
+        this.helpers
+            .slice(0)
+            .sort()
+            .filter((helper: string) => typeof helpers[helper] === 'function')
+            .forEach((helper: string) => {
+                const name = root.generateNamedIdentifier(helper);
+                const helperFn = cleanWhitespace(helpers[helper](name));
+
+                output = helperFn + '\n\n' + output;
+            });
+
+        return output;
+    }
+
+    /**
      * Cast to a string.
      * 
      * @return {string}
      */
     public toString(): string {
         let output: string = cleanWhitespace(this.src);
-
-        // prepend helpers
-        if (this.isRoot()) {
-            output = Object.keys(this.helpers)
-                .map<Code|string>(name => this.helpers[name])
-                .concat(output)
-                .join('\n\n');
-        }
 
         // replace named identifiers
         output = output.replace(/\$\w+/g, (partial, offset) => {
@@ -209,12 +248,9 @@ function cleanWhitespace(src: string): string {
  * @param  {Code}   code 
  */
 function findPartials(code: Code): Partials {
-    const partials = (code.src.match(/\:\w+/g) || []).reduce((partials, partial) => {
+    return (code.src.match(/\:\w+/g) || []).reduce((partials, partial) => {
         return { ...partials, [partial.slice(1)]: [] }
     }, {});
-    
-
-    return partials;
 }
 
 /**
