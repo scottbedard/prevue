@@ -55,7 +55,7 @@ export default class Compiler
 
         this.code.append(createMainFragment, 'fragments');
         
-        this.code.registerHelper('noop', 'function noop(){}');
+        // this.code.registerHelper('noop');
     }
 
     /**

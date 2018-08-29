@@ -1,5 +1,4 @@
 import Code from './code';
-import { noop } from './helpers';
 
 type LifecycleHook = 'create' | 'destroy' | 'mount' | 'update';
 
@@ -61,9 +60,7 @@ export default class Fragment extends Code
      */
     getPartial(name: LifecycleHook): string {
         if (this.partialIsEmpty(name)) {
-            this.registerHelper('noop', noop);
-
-            return 'noop';
+            return this.registerHelper('noop');
         }
 
         return `

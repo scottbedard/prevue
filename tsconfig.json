@@ -21,7 +21,8 @@
       "chai-subset",
       "jsdom",
       "mocha",
-      "node"
+      "node",
+      "uglify-js"
     ]
   },
   "include": [

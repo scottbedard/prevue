@@ -45,6 +45,7 @@
     "@types/jsdom": "^11.0.6",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.0.3",
+    "@types/uglify-js": "^3.0.3",
     "chai": "^4.1.2",
     "chai-subset": "^1.6.0",
     "cross-env": "^5.0.1",
@@ -67,6 +68,7 @@
     "tslint-config-prettier": "^1.1.0",
     "tslint-config-standard": "^7.0.0",
     "typedoc": "^0.11.1",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "uglify-js": "^3.4.8"
   }
 }

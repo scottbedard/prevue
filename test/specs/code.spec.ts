@@ -6,14 +6,25 @@ import { expect } from 'chai';
 // specs
 //
 describe('code generation', function () {
-    it('removes indentation and surrounding whitespace', function () {
-        const code = new Code(`
+    it('chai code assertions', function () {
+        // different whitespace
+        expect(`
             if (foo) {
-                return true;
+                bar();
             }
-        `);
+        `).to.equalCode(`if (foo) { bar() }`)
 
-        expect(code.toString()).to.equal(`if (foo) {\n    return true;\n}`);
+        // different statement endings
+        expect(`foo()`).to.equalCode(`foo();`);
+
+        // different quotation styles
+        expect(`let foo = "bar"`).to.equalCode(`let foo = 'bar'`);
+
+        // different brackets
+        expect(`if (foo) bar()`).to.equalCode(`if (foo) { bar(); }`);
+
+        // asserting with code objects
+        expect(new Code(`let one = 1`)).to.equalCode(`let one = 1`);
     });
 
     it('appends to partials', function () {
@@ -26,10 +37,14 @@ describe('code generation', function () {
         expect(code.partials).to.deep.equal({ bar: [] });
 
         code.append(`
-            // bar
+            bar();
         `, 'bar');
 
-        expect(code.toString()).to.equal(`if (foo) {\n    // bar\n}`);
+        expect(code.toString()).to.equalCode(`
+            if (foo) {
+                bar();
+            }
+        `);
     });
 
     it('computes hierarchical parent relationships', function () {
@@ -71,22 +86,25 @@ describe('code generation', function () {
     }); 
 
     it('registers partial resolvers', function () {
-        const code = new Code(`
-            if (true) {
+        const src = new Code(`
+            if (foo) {
                 :hello
             }
         `);
 
-        code.registerDynamicPartial('hello', (c) => {
-            expect(c).to.equal(code);
+        src.registerDynamicPartial('hello', (c) => {
+            expect(c).to.equal(src);
 
             return `
-                // line 1
-                // line 2
+                bar();
             `
         });
 
-        expect(code.toString()).to.equal(`if (true) {\n    // line 1\n    // line 2\n}`);
+        expect(src).to.equalCode(`
+            if (foo) {
+                bar();
+            }
+        `);
     });
 
     it.skip('generates unique names for identifiers', function () {
@@ -104,7 +122,7 @@ describe('code generation', function () {
 
     it('can be rendered with helpers', function () {
         const parent = new Code(`
-            if (true) {
+            if (foo) {
                 :children
             }
         `);
@@ -115,6 +133,12 @@ describe('code generation', function () {
             ${noop}();
         `, 'children');
 
-        expect(parent.render()).to.equal(`function noop(){}\n\nif (true) {\n    noop();\n}`)
-    })
+        expect(parent.render()).to.equalCode(`
+            function noop(){}
+            
+            if (foo) {
+                noop();
+            }
+        `);
+    });
 });
