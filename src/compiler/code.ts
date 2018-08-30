@@ -86,7 +86,7 @@ export default class Code
      * 
      * @param  {string}     name        an ideal name for the identifier, if it's available
      * @param  {boolean}    remember    causes the identifier name to only be generated once
-     * @param name 
+     * @return {string}
      */
     public generateNamedIdentifier(name: string, remember: boolean = false): string {
         // always generate identifiers from the root context
@@ -142,9 +142,12 @@ export default class Code
 
     /**
      * Register a dynamic partial
-     * @param name 
+     * 
+     * @param  {string}                     name
+     * @param  {DynamicPartialResolver}     resolver
+     * @return {void}
      */
-    public registerDynamicPartial(name: string, resolver: DynamicPartialResolver) {
+    public registerDynamicPartial(name: string, resolver: DynamicPartialResolver): void {
         this.dynamicPartials[name] = resolver;
     }
 
@@ -284,4 +287,3 @@ function getDynamicPartial(code: Code, name: string): Code {
 
     return typeof content === 'string' ? new Code(content): content;
 }
-
