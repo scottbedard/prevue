@@ -1,6 +1,7 @@
-import Fragment from '../../src/compiler/fragment';
 import Code from '../../src/compiler/code';
+import Fragment from '../../src/compiler/fragment';
 import { expect } from 'chai';
+import { expectCode } from '../utils';
 
 //
 // specs
@@ -15,7 +16,7 @@ describe('fragment', function () {
     it('renders "noop" for empty partials', function () {
         const fragment = new Fragment('whatever');
 
-        expect(fragment.render()).to.equalCode(`
+        expectCode(fragment.render()).to.equal(`
             function noop(){}
             
             function whatever() {
@@ -34,7 +35,7 @@ describe('fragment', function () {
 
         fragment.append(`doSomething()`, 'init');
 
-        expect(fragment.render()).to.equalCode(`
+        expectCode(fragment.render()).to.equal(`
             function noop(){}
 
             function whatever() {
@@ -58,7 +59,7 @@ describe('fragment', function () {
         fragment.append('// mount', 'mount');
         fragment.append('// update', 'update');
 
-        expect(fragment.render()).to.equalCode(`
+        expectCode(fragment.render()).to.equal(`
             function whatever() {
                 return {
                     c: function create() {

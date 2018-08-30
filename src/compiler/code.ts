@@ -1,8 +1,11 @@
-import Compiler from './compiler';
-import helpers from './helpers';
 import { lint } from '../utils/linter';
+import helpers from './helpers';
 
 type DynamicPartialResolver = (code?: Code) => Code | string;
+
+interface CodeOptions {
+    identifiers?: Array<string>,
+}
 
 interface DynamicPartials {
     [key: string]: DynamicPartialResolver,
@@ -28,6 +31,11 @@ export default class Code
     helpers: Array<string> = [];
 
     /**
+     * @var {Array<string>} identifiers
+     */
+    identifiers: Array<string> = [];
+
+    /**
      * @var {Code|null} parent
      */
     parent: Code | null = null;
@@ -47,9 +55,10 @@ export default class Code
      * 
      * @param  {string}     src 
      */
-    constructor(src: string = '') {
+    constructor(src: string = '', options: CodeOptions = {}) {
         this.src = src;
         this.partials = findPartials(this);
+        this.identifiers = options.identifiers || [];
     }
 
     /**
@@ -73,11 +82,33 @@ export default class Code
     }
 
     /**
+     * Generate a named identifier.
      * 
+     * @param  {string}     name        an ideal name for the identifier, if it's available
+     * @param  {boolean}    remember    causes the identifier name to only be generated once
      * @param name 
      */
-    public generateNamedIdentifier(name: string): string {
-        return name;
+    public generateNamedIdentifier(name: string, remember: boolean = false): string {
+        // always generate identifiers from the root context
+        if (!this.isRoot()) {
+            return this.root.generateNamedIdentifier(name, remember);
+        }
+
+        // itterate over possible identifiers until we find one that is unused
+        let i = 0;
+        let identifier = name;
+
+        while (this.identifiers.includes(identifier)) {
+            identifier = name + String(++i);
+        }
+
+        // remember this identifier to prevent generating it again
+        if (remember) {
+            this.identifiers.push(identifier)
+        }
+
+        // and finally, return the named identifier
+        return identifier;
     }
 
     /**

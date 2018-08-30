@@ -1,6 +1,7 @@
 import Code from '../../src/compiler/code';
 import Compiler from '../../src/compiler/compiler';
 import { expect } from 'chai';
+import { expectCode } from '../utils';
 
 //
 // specs
@@ -8,23 +9,23 @@ import { expect } from 'chai';
 describe('code generation', function () {
     it('chai code assertions', function () {
         // different whitespace
-        expect(`
+        expectCode(`
             if (foo) {
                 bar();
             }
-        `).to.equalCode(`if (foo) { bar() }`)
+        `).to.equal(`if (foo) { bar() }`)
 
         // different statement endings
-        expect(`foo()`).to.equalCode(`foo();`);
+        expectCode(`foo()`).to.equal(`foo();`);
 
         // different quotation styles
-        expect(`let foo = "bar"`).to.equalCode(`let foo = 'bar'`);
+        expectCode(`let foo = "bar"`).to.equal(`let foo = 'bar'`);
 
         // different brackets
-        expect(`if (foo) bar()`).to.equalCode(`if (foo) { bar(); }`);
+        expectCode(`if (foo) bar()`).to.equal(`if (foo) { bar(); }`);
 
         // asserting with code objects
-        expect(new Code(`let one = 1`)).to.equalCode(`let one = 1`);
+        expectCode(new Code(`let one = 1`)).to.equal(`let one = 1`);
     });
 
     it('appends to partials', function () {
@@ -40,7 +41,7 @@ describe('code generation', function () {
             bar();
         `, 'bar');
 
-        expect(code.toString()).to.equalCode(`
+        expectCode(code).to.equal(`
             if (foo) {
                 bar();
             }
@@ -100,24 +101,33 @@ describe('code generation', function () {
             `
         });
 
-        expect(src).to.equalCode(`
+        expectCode(src).to.equal(`
             if (foo) {
                 bar();
             }
         `);
     });
 
-    it.skip('generates unique names for identifiers', function () {
-        const parent = new Code(`
-            // parent $foo
-            :children
-        `);
-
-        const child = new Code(`
-            // child $foo
-        `);
+    it('generates unique names for identifiers', function () {
+        const parent = new Code(`:children`, { identifiers: ['foo'] });
+        const child = new Code();
 
         parent.append(child, 'children');
+
+        // generate the identifier foo from both contexts, but don't remember it
+        expect(parent.generateNamedIdentifier('foo')).to.equal('foo1');
+        expect(child.generateNamedIdentifier('foo')).to.equal('foo1');
+
+        // generate the idenfitier again, and this time remember it
+        expect(child.generateNamedIdentifier('foo', true)).to.equal('foo1');
+
+        // future generations of a "foo" identifier should be incremented
+        expect(parent.generateNamedIdentifier('foo')).to.equal('foo2');
+        expect(child.generateNamedIdentifier('foo')).to.equal('foo2');
+
+        // and generating an identifier we've never seen should not be incremented
+        expect(parent.generateNamedIdentifier('bar')).to.equal('bar');
+        expect(child.generateNamedIdentifier('bar')).to.equal('bar');
     });
 
     it('can be rendered with helpers', function () {
@@ -133,7 +143,7 @@ describe('code generation', function () {
             ${noop}();
         `, 'children');
 
-        expect(parent.render()).to.equalCode(`
+        expectCode(parent.render()).to.equal(`
             function noop(){}
             
             if (foo) {
@@ -157,7 +167,7 @@ describe('code generation', function () {
             ${noop2}();
         `, 'children');
 
-        expect(parent.render()).to.equalCode(`
+        expectCode(parent.render()).to.equal(`
             function noop(){}
 
             if (foo) {
