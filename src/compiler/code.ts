@@ -1,11 +1,6 @@
 import Compiler from './compiler';
 import helpers from './helpers';
-
-import { 
-    cleanWhitespace, 
-    indentationAtOffset,
-    isIndented,
-} from '../utils/code';
+import { lint } from '../utils/linter';
 
 type DynamicPartialResolver = (code?: Code) => Code | string;
 
@@ -163,13 +158,15 @@ export default class Code
      * @return {string}
      */
     public render(): string {
-        return this.isRoot 
+        const output = this.isRoot 
             ? this.renderSubtree() 
             : this.root.renderSubtree();
+
+        return lint(output);
     }
 
     /**
-     * Render a code free from this instance down.
+     * Render a code tree from this instance down.
      * 
      * @return {string}
      */
@@ -183,12 +180,12 @@ export default class Code
             .filter((helper: string) => typeof helpers[helper] === 'function')
             .forEach((helper: string) => {
                 const name = root.generateNamedIdentifier(helper);
-                const helperFn = cleanWhitespace(helpers[helper](name));
+                const helperFn = helpers[helper](name);
 
                 output = helperFn + '\n\n' + output;
             });
 
-        return output;
+        return output.trim();
     }
 
     /**
@@ -197,7 +194,7 @@ export default class Code
      * @return {string}
      */
     public toString(): string {
-        let output: string = cleanWhitespace(this.src);
+        let output: string = this.src;
 
         // replace named identifiers
         output = output.replace(/\$\w+/g, (partial, offset) => {
@@ -207,26 +204,15 @@ export default class Code
         // replace partials
         output = output.replace(/\:\w+/g, (partial, offset): string => {
             const name = partial.slice(1);
-            const indentation = indentationAtOffset(output, offset);
-            const applyLineIndentation = (ln: string, i: number) => i === 0 ? ln : indentation + ln;
             
             // dynamic partials
             if (typeof this.dynamicPartials[name] !== 'undefined') {
-                return getDynamicPartial(this, name)
-                    .toString()
-                    .split('\n')
-                    .map(applyLineIndentation)
-                    .join('\n');
+                return getDynamicPartial(this, name).toString();
             }
             
             // default partial resolution
             return this.partials[name]
-                .map(code => {
-                    return code.toString()
-                        .split('\n')
-                        .map(applyLineIndentation)
-                        .join('\n')
-                })
+                .map(code => code.toString())
                 .join('\n');
         });
 
@@ -252,7 +238,7 @@ function findPartials(code: Code): Partials {
  * @return {Code} 
  */
 function getCodeFromContent(content: Code | string): Code {
-    return typeof content === 'string' ? new Code(cleanWhitespace(content)) : content;
+    return typeof content === 'string' ? new Code(content) : content;
 }
 
 /**

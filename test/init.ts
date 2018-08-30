@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import chaiSubset = require('chai-subset');
 import * as uglify from 'uglify-js';
-import { cleanWhitespace } from '../src/utils/code';
+import { lint } from '../src/utils/linter';
 
 //
 // object subset assertions
@@ -12,7 +12,7 @@ chai.use(chaiSubset);
 // custom chai assertions
 //
 declare global {
-    namespace Chai {
+    export namespace Chai {
         interface Assertion {
             equalCode(expectedSouce: string): void;
         }
@@ -30,7 +30,14 @@ chai.use(function (_chai, utils) {
 
         const actual = String(this._obj);
 
-        new _chai.Assertion(minify(actual)).to.equal(minify(expected), `\n\nExpected:\n${cleanWhitespace(expected)}\n\nActual:\n${cleanWhitespace(actual)}\n\n`);
+        try {
+            new _chai.Assertion(minify(actual)).to.equal(minify(expected));
+        } catch (e) {
+            const lintActual = lint(actual).trim().split('\n').map(ln => '    ' + ln).join('\n');
+            const lintExpected = lint(expected).trim().split('\n').map(ln => '    ' + ln).join('\n');
+
+            throw new Error(`\n\nFailed asserting code equality\n\nExpected:\n${lintExpected}\n\nActual:\n${lintActual}\n\n`);
+        }
     });
 });
 

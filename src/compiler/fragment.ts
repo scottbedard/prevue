@@ -8,31 +8,20 @@ type LifecycleHook = 'create' | 'destroy' | 'mount' | 'update';
 export default class Fragment extends Code
 {
     /**
-     * @var {Code} create
+     * @var {string} name
      */
-    create: Code;
-
-    /**
-     * @var {Code} destroy
-     */
-    destroy: Code;
-
-    /**
-     * @var {Code} mount
-     */
-    mount: Code;
-
-    /**
-     * @var {Code} update
-     */
-    update: Code;
+    name: string;
     
     /**
      * Constructor.
+     * 
+     * @param  {string} name
      */
-    constructor() {
+    constructor(name: string = 'unknownFragment') {
         super(`
-            function createMainFragment() {
+            function ${name}() {
+                :init
+
                 return {
                     c: :create,
                     d: :destroy,
@@ -42,30 +31,29 @@ export default class Fragment extends Code
             }
         `);
 
-        this.create = new Code;
-        this.destroy = new Code;
-        this.mount = new Code;
-        this.update = new Code;
+        // set fragment name
+        this.name = name;
 
-        this.registerDynamicPartial('create', () => this.getPartial('create'));
-        this.registerDynamicPartial('destroy', () => this.getPartial('destroy'));
-        this.registerDynamicPartial('mount', () => this.getPartial('mount'));
-        this.registerDynamicPartial('update', () => this.getPartial('update'));
+        // register dynamic lifecycle hook partials
+        ['create', 'destroy', 'mount', 'update'].forEach((hook) => {
+            this.registerDynamicPartial(hook, () => this.getPartial(hook));
+        });
     }
 
     /**
      * Returns a lifecycle partial, or noop if there is no content.
      * 
-     * @param  {string}     name
+     * @param  {string} name
+     * @return {string}
      */
-    getPartial(name: LifecycleHook): string {
+    getPartial(name: string): string {
         if (this.partialIsEmpty(name)) {
             return this.registerHelper('noop');
         }
 
         return `
-            function create() {
-                // hmmm
+            function ${name}() {
+                ${this.partials[name].join('\n\n')}
             }
         `;
     }
