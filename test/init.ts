@@ -9,10 +9,10 @@ import { cleanWhitespace } from '../src/utils/code';
 chai.use(chaiSubset);
 
 //
-// custom assertions
+// custom chai assertions
 //
 declare global {
-    export namespace Chai {
+    namespace Chai {
         interface Assertion {
             equalCode(expectedSouce: string): void;
         }
@@ -33,3 +33,5 @@ chai.use(function (_chai, utils) {
         new _chai.Assertion(minify(actual)).to.equal(minify(expected), `\n\nExpected:\n${cleanWhitespace(expected)}\n\nActual:\n${cleanWhitespace(actual)}\n\n`);
     });
 });
+
+export {};

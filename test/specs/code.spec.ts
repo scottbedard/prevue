@@ -141,4 +141,29 @@ describe('code generation', function () {
             }
         `);
     });
+
+    it('only includes a helper once', function () {
+        const parent = new Code(`
+            if (foo) {
+                :children
+            }
+        `);
+
+        const noop1 = parent.registerHelper('noop');
+        const noop2 = parent.registerHelper('noop');
+
+        parent.append(`
+            ${noop1}();
+            ${noop2}();
+        `, 'children');
+
+        expect(parent.render()).to.equalCode(`
+            function noop(){}
+
+            if (foo) {
+                noop();
+                noop();
+            }
+        `);
+    });
 });

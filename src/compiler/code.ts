@@ -135,7 +135,9 @@ export default class Code
 
         const root = this.root;
 
-        root.helpers.push(name);
+        if (root.helpers.indexOf(name) === -1) {
+            root.helpers.push(name);
+        }
         
         return root.generateNamedIdentifier(name);
     }
