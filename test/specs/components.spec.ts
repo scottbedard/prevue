@@ -31,8 +31,14 @@ describe('components', () => {
             }
 
             // focus, skip, or standard run the test
-            if (test.only) it.only(file, testFn);
-            else if (test.skip) it.skip(file, testFn);
-            else it(file, testFn);
+            if (file === '_sandbox') {
+                if (test.only) {
+                    it.only(file, testFn);
+                }
+            } else {
+                if (test.only) it.only(file, testFn);
+                else if (test.skip) it.skip(file, testFn);
+                else it(file, testFn);
+            }
         });
 });

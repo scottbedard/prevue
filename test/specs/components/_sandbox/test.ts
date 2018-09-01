@@ -11,9 +11,8 @@ export const only = false;
 export const options = {};
 
 //
-// skip
+// the sandbox test will always be skipped when "only" is false
 //
-export const skip = true;
 
 //
 // test
