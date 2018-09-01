@@ -24,6 +24,7 @@
     "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
     "pretest": "tsc",
+    "posttest": "nyc report --reporter=json",
     "test": "nyc mocha --opts test/mocha.opts -r ts-node/register -r tsconfig-paths/register test/**/*.spec.ts",
     "test:watch": "nyc mocha --opts test/mocha.opts -r ts-node/register -r tsconfig-paths/register test/**/*.spec.ts --watch",
     "prepare": "tsc",
