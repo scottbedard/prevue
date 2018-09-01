@@ -287,6 +287,11 @@ function getDynamicPartial(code: Code, name: string): Code {
 function isIndented(src: Array<string> | string): boolean {
     const lines = Array.isArray(src) ? src : src.split('\n');
 
+    // if no lines start with a whitespace, it isn't indented
+    if (lines.filter(ln => ln.startsWith(' ')).length === 0) {
+        return false;
+    }
+
     return lines.filter(ln => ln.startsWith(' ') || ln.length === 0 ).length === lines.length;
 }
 

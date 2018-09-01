@@ -108,7 +108,7 @@ describe('code generation', function () {
         `);
     });
 
-    it.skip('generates unique names for identifiers', function () {
+    it('generates unique names for identifiers', function () {
         const parent = new Code(`:children`, { identifiers: ['foo'] });
         const child = new Code();
 
