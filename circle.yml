@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Codecov
           command: |
-            bash <(curl -s https://codecov.io/bash) -t 56930aae-ed0b-4274-bb1b-53aa16152bcd -cF typescript
+            bash <(curl -s https://codecov.io/bash) -t 56930aae-ed0b-4274-bb1b-53aa16152bcd
 workflows:
   version: 2
   tests:
