@@ -1,5 +1,5 @@
-import { lint } from '../utils/linter';
 import helpers from './helpers';
+import { lint } from 'src/utils/linter';
 
 type DynamicPartialResolver = (code?: Code) => Code | string;
 
@@ -56,7 +56,7 @@ export default class Code
      * @param  {string}     src 
      */
     constructor(src: string = '', options: CodeOptions = {}) {
-        this.src = src;
+        this.src = removeLeadingIndentation(src);
         this.partials = findPartials(this);
         this.identifiers = options.identifiers || [];
     }
@@ -192,20 +192,10 @@ export default class Code
      * @return {string}
      */
     public render(): string {
-        const output = this.isRoot 
-            ? this.renderSubtree() 
-            : this.root.renderSubtree();
+        if (!this.isRoot()) {
+            return this.root.render();
+        }
 
-        return lint(output);
-    }
-
-    /**
-     * Render a code tree from this instance down.
-     * 
-     * @return {string}
-     */
-    public renderSubtree(): string {
-        const root = this.root;
         let output = this.toString();
         
         this.helpers
@@ -213,13 +203,13 @@ export default class Code
             .sort()
             .filter((helper: string) => typeof helpers[helper] === 'function')
             .forEach((helper: string) => {
-                const name = root.generateNamedIdentifier(helper);
+                const name = this.generateNamedIdentifier(helper);
                 const helperFn = helpers[helper](name);
 
                 output = helperFn + '\n\n' + output;
             });
 
-        return output.trim();
+        return lint(output.trim());
     }
 
     /**
@@ -286,4 +276,32 @@ function getDynamicPartial(code: Code, name: string): Code {
     const content = code.dynamicPartials[name](code);
 
     return typeof content === 'string' ? new Code(content): content;
+}
+
+/**
+ * Determine if all lines start with whitespace.
+ * 
+ * @param  {Array<string>|string}   src
+ * @return {boolean} 
+ */
+function isIndented(src: Array<string> | string): boolean {
+    const lines = Array.isArray(src) ? src : src.split('\n');
+
+    return lines.filter(ln => ln.startsWith(' ') || ln.length === 0 ).length === lines.length;
+}
+
+/**
+* Remove extra leading indentation from code.
+* 
+* @param  {string}     src
+* @return {string} 
+*/
+function removeLeadingIndentation(src: string): string {
+    let lines = src.split('\n');
+
+    while (isIndented(lines)) {
+        lines = lines.map(line => line.substr(1));
+    }
+
+    return lines.join('\n').trim();
 }

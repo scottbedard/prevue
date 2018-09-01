@@ -1,13 +1,13 @@
 import { JSDOM } from 'jsdom';
-import { Node } from 'highlight.js';
+
 import { 
     CompilerOptions, 
+    NodeDynamicAttrs,
     NodeStaticAttrs,
     NodeType, 
     ParsedSource,
     SerializedNode,
-    NodeDynamicAttrs,
-} from '../types';
+} from 'src/types';
 
 /**
  * Parse source code into an abstract syntax tree

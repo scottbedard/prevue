@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import Compiler from '../../src/compiler/compiler';
+import Compiler from 'src/compiler/compiler';
 
 //
 // specs

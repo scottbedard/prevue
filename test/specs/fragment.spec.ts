@@ -1,7 +1,7 @@
-import Code from '../../src/compiler/code';
-import Fragment from '../../src/compiler/fragment';
+import Code from 'src/compiler/code';
+import Fragment from 'src/compiler/fragment';
 import { expect } from 'chai';
-import { expectCode } from '../utils';
+import { expectCode } from 'test/utils';
 
 //
 // specs

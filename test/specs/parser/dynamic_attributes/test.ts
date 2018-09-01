@@ -1,4 +1,4 @@
-import Compiler from '../../../../src/compiler/compiler';
+import Compiler from 'src/compiler/compiler';
 import { expect } from 'chai';
 
 //

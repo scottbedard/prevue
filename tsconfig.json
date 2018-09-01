@@ -31,10 +31,10 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ],
   "exclude": [
-    "**/*.spec.ts",
     "node_modules"
   ]
 }

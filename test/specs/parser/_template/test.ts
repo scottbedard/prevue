@@ -1,4 +1,4 @@
-import Compiler from '../../../../src/compiler/compiler';
+import Compiler from 'src/compiler/compiler';
 import { expect } from 'chai';
 
 //
@@ -24,7 +24,7 @@ export const options = {};
 //
 // skip
 //
-export const skip = false;
+export const skip = true;
 
 //
 // test

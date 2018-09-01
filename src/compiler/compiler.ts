@@ -2,9 +2,9 @@ import {
     CompilerOptions,
     CompilerOutput,
     ParsedSource,
-} from '../types';
+} from 'src/types';
 
-import { parse } from '../parser/parser';
+import { parse } from 'src/parser/parser';
 import Code from './code';
 import Fragment from './fragment';
 
@@ -47,15 +47,16 @@ export default class Compiler
             :fragments
 
             return function ${options.name}() {
-                var f = createMainFragment();
+                :init
             }
         `);
 
-        const createMainFragment = new Fragment;
+        const mainFragmentName = this.code.generateNamedIdentifier('mainFragment');
+        const fragment = new Fragment(mainFragmentName);
 
-        this.code.append(createMainFragment, 'fragments');
-        
-        // this.code.registerHelper('noop');
+        this.code.append(`const f = ${mainFragmentName}();`, 'init');
+
+        this.code.append(fragment, 'fragments');
     }
 
     /**
@@ -65,7 +66,7 @@ export default class Compiler
      */
     compile(): CompilerOutput {
         return {
-            code: this.code.toString(),
+            code: this.code.render(),
         }
     }
 
