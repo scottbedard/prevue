@@ -111,7 +111,7 @@ function getRootElement(source: string): Element {
     const template = document.querySelector('template');
 
     if (template === null) {
-        throw new Error('Failed to parse component, no template found.');
+        throw new Error('Failed to mount component: template or render function not defined.');
     }
 
     const rootElement = template.content.firstElementChild;
