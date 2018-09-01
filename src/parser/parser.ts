@@ -82,6 +82,7 @@ function getDynamicAttrs(node: Element, nodeType: NodeType, options: CompilerOpt
 
 /**
  * Convert a nodeType into an easy to read string
+ * https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType#Constants
  * 
  * @param  {Element}    node
  * @return {NodeType} 
@@ -89,6 +90,13 @@ function getDynamicAttrs(node: Element, nodeType: NodeType, options: CompilerOpt
 function getNodeType(node: Element): NodeType {
     if (node.nodeType === 1) return 'element';
     if (node.nodeType === 3) return 'text';
+    // @todo: if (node.nodeType === 4) return 'cdata';
+    // @todo: if (node.nodeType === 7) return 'processingInstruction';
+    // @todo: if (node.nodeType === 8) return 'comment';
+    // @todo: if (node.nodeType >= 9 && node.nodeType <= 11) throw new Error('Document elements cannot be used in templates');
+
+    // it shouldn't be possible to get here, but just incase use "unknown"
+    /* istanbul ignore next */
     return 'unknown';
 }
 
