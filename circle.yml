@@ -11,15 +11,19 @@ jobs:
           name: Install Dependencies
           command: |
             yarn
-      - run:
-          name: Test
-          command: |
-            yarn test
       - save_cache:
           key: -v3-{{ checksum "yarn.lock" }}
           paths:
             - "yarn.lock"
             - "node_modules"
+      - run:
+          name: Test
+          command: |
+            yarn test
+            - run:
+          name: Codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash) -t 56930aae-ed0b-4274-bb1b-53aa16152bcd -cF typescript
 workflows:
   version: 2
   tests:

@@ -1,3 +1,6 @@
+--bail
+--full-trace
+--require source-map-support/register
 --watch-extensions ts,vue
 test/init.ts
 test/**/*.spec.ts
