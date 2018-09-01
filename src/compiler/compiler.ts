@@ -42,21 +42,7 @@ export default class Compiler
     constructor(options: CompilerOptions, source: string = '') {
         this.options = options;
         this.source = source;
-
-        this.code = new Code(`
-            :fragments
-
-            return function ${options.name}() {
-                :init
-            }
-        `);
-
-        const mainFragmentName = this.code.generateNamedIdentifier('mainFragment');
-        const fragment = new Fragment(mainFragmentName);
-
-        this.code.append(`const f = ${mainFragmentName}();`, 'init');
-
-        this.code.append(fragment, 'fragments');
+        this.code = createCodeInstance(this);
     }
 
     /**
@@ -65,6 +51,16 @@ export default class Compiler
      * @return  {CompilerOutput}
      */
     compile(): CompilerOutput {
+        this.code = new Code(`
+            :fragments
+
+            return function ${this.options.name}() {
+                :init
+            }
+        `);
+
+        createMainFragment(this);
+
         return {
             code: this.code.render(),
         }
@@ -78,4 +74,37 @@ export default class Compiler
     parse(): void {
         this.parsedSource = parse(this.source, this.options);
     }
+}
+
+/**
+ * Generate a fresh code instance for a component.
+ * 
+ * @param  {Compiler}   compiler
+ * @return {Code} 
+ */
+function createCodeInstance(compiler: Compiler): Code {
+    // @todo: check options for output type
+
+    return new Code(`
+        :fragments
+
+        return function ${compiler.options.name}() {
+            :init
+        }
+    `);
+}
+
+/**
+ * Create the main fragment and append it to initialization.
+ * 
+ * @param  {Compiler}   compiler
+ * @return {void} 
+ */
+function createMainFragment(compiler: Compiler): void {
+    const constructorName = compiler.code.generateNamedIdentifier('createMainFragment');
+    const instanceName = compiler.code.generateNamedIdentifier('mainFragment');
+    const fragment = new Fragment(constructorName);
+    
+    compiler.code.append(fragment, 'fragments');
+    compiler.code.append(`const ${instanceName} = ${constructorName}();`, 'init');
 }

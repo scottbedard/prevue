@@ -116,18 +116,21 @@ describe('code generation', function () {
 
         // generate the identifier foo from both contexts, but don't remember it
         expect(parent.generateNamedIdentifier('foo')).to.equal('foo1');
-        expect(child.generateNamedIdentifier('foo')).to.equal('foo1');
-
-        // generate the idenfitier again, and this time remember it
-        expect(child.generateNamedIdentifier('foo', true)).to.equal('foo1');
-
-        // future generations of a "foo" identifier should be incremented
-        expect(parent.generateNamedIdentifier('foo')).to.equal('foo2');
         expect(child.generateNamedIdentifier('foo')).to.equal('foo2');
 
-        // and generating an identifier we've never seen should not be incremented
-        expect(parent.generateNamedIdentifier('bar')).to.equal('bar');
-        expect(child.generateNamedIdentifier('bar')).to.equal('bar');
+        // generate the idenfitier again, and this time dont remember it
+        expect(parent.generateNamedIdentifier('bar', false)).to.equal('bar');
+        expect(child.generateNamedIdentifier('bar', false)).to.equal('bar');
+    });
+
+    it('gets a named identifier', function () {
+        const parent = new Code(`:children`);
+        const child = new Code();
+
+        parent.append(child, 'children');
+
+        expect(parent.getNamedIdentifier('noop')).to.equal('noop');
+        expect(child.getNamedIdentifier('noop')).to.equal('noop');
     });
 
     it('can be rendered with helpers', function () {

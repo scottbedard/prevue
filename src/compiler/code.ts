@@ -88,7 +88,7 @@ export default class Code
      * @param  {boolean}    remember    causes the identifier name to only be generated once
      * @return {string}
      */
-    public generateNamedIdentifier(name: string, remember: boolean = false): string {
+    public generateNamedIdentifier(name: string, remember: boolean = true): string {
         // always generate identifiers from the root context
         if (!this.isRoot()) {
             return this.root.generateNamedIdentifier(name, remember);
@@ -109,6 +109,16 @@ export default class Code
 
         // and finally, return the named identifier
         return identifier;
+    }
+
+    /**
+     * Helper to generate identifiers without incrementing a value.
+     * 
+     * @param  {string}     name
+     * @return {string}
+     */
+    public getNamedIdentifier(name: string): string {
+        return this.generateNamedIdentifier(name, false);
     }
 
     /**
@@ -168,7 +178,7 @@ export default class Code
             root.helpers.push(name);
         }
         
-        return root.generateNamedIdentifier(name);
+        return root.getNamedIdentifier(name);
     }
 
     /**
