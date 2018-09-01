@@ -1,8 +1,27 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/node:8.11.4-browsers
     steps:
       - checkout
-      - run: yarn test
+      - restore_cache:
+          key: -v3-{{ checksum "yarn.lock" }}
+      - run: 
+          name: Install Dependencies
+          command: |
+            yarn
+      - run:
+          name: Test
+          command: |
+            yarn test
+      - save_cache:
+          key: -v3-{{ checksum "yarn.lock" }}
+          paths:
+            - "yarn.lock"
+            - "node_modules"
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - test
