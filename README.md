@@ -1,6 +1,6 @@
 # prevue
 
-[![Build status](https://img.shields.io/circleci/project/scottbedard/prevue/master.svg?style=flat)](https://circleci.com/gh/scottbedard/prevue)
+[![Build status](https://img.shields.io/circleci/project/github/scottbedard/prevue/master.svg?style=flat)](https://circleci.com/gh/scottbedard/prevue)
 [![Coverage](https://img.shields.io/codecov/c/github/scottbedard/prevue/master.svg?style=flat)](https://codecov.io/gh/scottbedard/prevue)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/scottbedard/prevue/blob/master/LICENSE)
 
