@@ -1,4 +1,5 @@
 import helpers from './helpers';
+import { camelCase, capitalize } from 'lodash';
 import { lint } from 'src/utils/linter';
 
 type DynamicPartialResolver = (code?: Code) => Code | string;
@@ -20,6 +21,8 @@ interface Partials {
  */
 export default class Code 
 {
+    [index: string]: any;
+
     /**
      * @var {DynamicPartials} dynamicPartials
      */
@@ -236,10 +239,17 @@ export default class Code
         });
 
         // replace partials
-        output = output.replace(/\:\w+/g, (partial, offset): string => {
+        output = output.replace(/\:\w+/g, (partial: string, offset): string => {
             const name = partial.slice(1);
-            
+
             // dynamic partials
+            const partialFn = 'get' + capitalize(camelCase(partial)) + 'Partial';
+
+            if (typeof this[partialFn] === 'function') {
+                return this[partialFn](this).toString();
+            }
+            
+            // dynamic partials (deprecated, use partial functions instead)
             if (typeof this.dynamicPartials[name] !== 'undefined') {
                 return getDynamicPartial(this, name).toString();
             }

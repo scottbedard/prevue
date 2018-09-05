@@ -179,4 +179,24 @@ describe('code generation', function () {
             }
         `);
     });
+
+    it('automatically registers dynamic partials by method naming convention', function () {
+        class Foo extends Code {
+            constructor() {
+                super(`
+                    foo();
+                    :whatever
+                `);
+            }
+
+            getWhateverPartial() {
+                return `bar();`;
+            }
+        }
+        
+        expectCode(new Foo).to.equal(`
+            foo();
+            bar();
+        `);
+    });
 });
