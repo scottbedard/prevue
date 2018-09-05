@@ -2,6 +2,7 @@ import {
     CompilerOptions,
     CompilerOutput,
     ParsedSource,
+    SerializedNode,
 } from 'src/types';
 
 import { parse } from 'src/parser/parser';
@@ -26,7 +27,7 @@ export default class Compiler
     /**
      * @var parsedSource
      */
-    parsedSource: ParsedSource | null = null;
+    parsedSource: ParsedSource;
 
     /**
      * @var source
@@ -43,6 +44,7 @@ export default class Compiler
         this.options = options;
         this.source = source;
         this.code = createCodeInstance(this);
+        this.parsedSource = parse(source, options);
     }
 
     /**
@@ -59,7 +61,16 @@ export default class Compiler
             }
         `);
 
-        createMainFragment(this);
+        // create a main fragment, and assign it to a variable in our "init" partial
+        const mainFragmentVar = this.code.generateNamedIdentifier('mainFragment');
+        const mainFragment = createFragment(this, 'createMainFragment');
+
+        this.code.append(`
+            const ${mainFragmentVar} = ${mainFragment.name}();
+        `, 'init');
+
+        // recursively process all fragments, starting with the template root
+        processFragment(this, mainFragment, this.parsedSource.template);
 
         return {
             code: this.code.render(),
@@ -95,16 +106,41 @@ function createCodeInstance(compiler: Compiler): Code {
 }
 
 /**
- * Create the main fragment and append it to initialization.
+ * Create a dom fragment.
  * 
  * @param  {Compiler}   compiler
- * @return {void} 
+ * @param  {string}     name
+ * @return {Fragment} 
  */
-function createMainFragment(compiler: Compiler): void {
-    const constructorName = compiler.code.generateNamedIdentifier('createMainFragment');
-    const instanceName = compiler.code.generateNamedIdentifier('mainFragment');
-    const fragment = new Fragment(constructorName);
+function createFragment(compiler: Compiler, name: string): Fragment {
+    const fragment = new Fragment(compiler.code.generateNamedIdentifier(name));
     
     compiler.code.append(fragment, 'fragments');
-    compiler.code.append(`const ${instanceName} = ${constructorName}();`, 'init');
+
+    return fragment;
+}
+
+/**
+ * Recursively generate fragments to represent the dom.
+ * 
+ * @param  {Compiler}       compiler
+ * @param  {Fragment}       fragment
+ * @param  {SerializedNode} node
+ * @return {void}
+ */
+function processFragment(compiler: Compiler, fragment: Fragment, node: SerializedNode): void {
+    // 1. itterate over processors and give each of them an opportunity
+    //    to declare that we need a new fragment.
+
+    // 2. if any processors raise their hand and say we need a new fragment,
+    //    go ahead and instantiate one here. we'll also need to append that
+    //    new fragment to the compiler's main code instance.
+
+    // 3. take the current fragment, or the newly created one, and pass
+    //    it to each of the processors so they can append code to the different
+    //    fragment partials.
+
+    // 4. call any post-processors that are defined
+
+    // 5. recursively process child nodes
 }
