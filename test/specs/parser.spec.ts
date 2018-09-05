@@ -65,9 +65,10 @@ describe('parser', () => {
     describe('errors', function () {
         it('throws an error if no template is present', function () {
             const source = ``;
-            const compiler = new Compiler({ format: 'fn', name: 'Component' }, source);
 
-            expect(compiler.parse).to.throw;
+            expect(() => {
+                new Compiler({ format: 'fn', name: 'Component' }, source);
+            }).to.throw;
         });
     });
 });
