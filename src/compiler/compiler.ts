@@ -5,9 +5,10 @@ import {
     SerializedNode,
 } from 'src/types';
 
-import { parse } from 'src/parser/parser';
 import Code from './code';
 import Fragment from './fragment';
+import { parse } from 'src/parser/parser';
+import { processors } from './processors/index';
 
 /**
  * Compiler.
@@ -129,18 +130,25 @@ function createFragment(compiler: Compiler, name: string): Fragment {
  * @return {void}
  */
 function processFragment(compiler: Compiler, fragment: Fragment, node: SerializedNode): void {
-    // 1. itterate over processors and give each of them an opportunity
-    //    to declare that we need a new fragment.
+    // 1. itterate over processors and give each of them an opportunity to opportunity
+    //    to announce that they need a new fragment context. if any raise their hand
+    //    hand by returning a new fragment name, go ahead and create that fragment.
+    let currentFragment = fragment;
 
-    // 2. if any processors raise their hand and say we need a new fragment,
-    //    go ahead and instantiate one here. we'll also need to append that
-    //    new fragment to the compiler's main code instance.
+    for (let i = 0, len = processors.length; i < len; i++) {
+        const processor = processors[i];
+        const fragmentName = processor.requiresNewFragment(node);
 
-    // 3. take the current fragment, or the newly created one, and pass
-    //    it to each of the processors so they can append code to the different
-    //    fragment partials.
+        if (fragmentName) {
+            currentFragment = createFragment(compiler, fragmentName);
+            break;
+        }
+    }
 
-    // 4. call any post-processors that are defined
+    // 2. pass current fragment to each processor so they can append to the various partials
+    processors.forEach(processor => processor.process(compiler, currentFragment, node));
 
-    // 5. recursively process child nodes
+    // 3. call any post-processors that are defined
+
+    // 4. recursively process child nodes
 }

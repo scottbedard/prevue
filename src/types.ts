@@ -1,3 +1,6 @@
+import Compiler from 'src/compiler/compiler';
+import Fragment from 'src/compiler/fragment';
+
 // compilation options
 export interface CompilerOptions {
     cleanOutput?: boolean,
@@ -9,6 +12,12 @@ export interface CompilerOptions {
 // compilation output
 export interface CompilerOutput {
     code: string,
+}
+
+// fragment processor
+export interface FragmentProcessor {
+    process: (compiler: Compiler, fragment: Fragment, node: SerializedNode) => void,
+    requiresNewFragment: (node: SerializedNode) => false | string,
 }
 
 // constructable types
