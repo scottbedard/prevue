@@ -24,9 +24,9 @@ export default class Fragment extends Code
 
                 return {
                     c: :create,
-                    d: :destroy,
                     m: :mount,
                     p: :update,
+                    d: :destroy,
                 };
             }
         `);
@@ -35,9 +35,26 @@ export default class Fragment extends Code
         this.name = name;
 
         // register dynamic lifecycle hook partials
-        ['create', 'destroy', 'mount', 'update'].forEach((hook) => {
+        ['create', 'destroy', 'update'].forEach((hook) => {
             this.registerDynamicPartial(hook, () => this.getPartial(hook));
         });
+    }
+
+    /**
+     * Mount.
+     * 
+     * @return {string}
+     */
+    getMountPartial(): string {
+        if (this.partialIsEmpty('mount')) {
+            return this.registerHelper('noop');
+        }
+
+        return `
+            function mount(target, anchor) {
+                ${this.partials.mount.join('\n\n')}
+            }
+        `
     }
 
     /**

@@ -27,6 +27,18 @@ const createText = (name: string): string => `
 `;
 
 /**
+ * Insert an element into the dom.
+ * 
+ * @param  {string} text
+ * @return {string}
+ */
+const insert = (name: string): string => `
+    function ${name}(target, node, anchor) {
+        target.insertBefore(node, anchor);
+    }
+`;
+
+/**
  * No-operation.
  * 
  * @param  {string}     name
@@ -42,6 +54,7 @@ const noop = (name: string): string => `
 const helpers: Helpers = {
     createElement,
     createText,
+    insert,
     noop,
 };
 

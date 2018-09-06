@@ -2,8 +2,10 @@ import Compiler from 'src/compiler/compiler';
 import Fragment from 'src/compiler/fragment';
 import { FragmentProcessor, SerializedNode } from 'src/types';
 import { isElementNode } from 'src/utils/serialized_node';
+import { notDeepEqual } from 'assert';
 
 export const elementProcessor: FragmentProcessor = {
+
     /**
      * Process the current node.
      * 
@@ -18,9 +20,24 @@ export const elementProcessor: FragmentProcessor = {
             return;
         }
 
-        const elementVar = fragment.getNamedIdentifier(<string> node.tagName);
+        // init
+        // define a variable for the element
+        const el = fragment.generateNamedIdentifier(<string> node.tagName);
+        fragment.append(`let ${el};`, 'init');
 
-        fragment.append(`let ${elementVar};`, 'init');
+        // create
+        // instantiate the element and assign it to our variable
+        const createElement = fragment.registerHelper('createElement');
+        fragment.append(`${el} = ${createElement}('${node.tagName}');`, 'create');
+
+        // mount
+        // insert our element into the dom
+        const insert = fragment.registerHelper('insert');
+        fragment.append(`${insert}(target, ${el}, anchor);`, 'mount');
+
+        // @todo: update
+
+        // @todo: destroy
     },
 
     /**
@@ -30,6 +47,12 @@ export const elementProcessor: FragmentProcessor = {
      * @return {false | string}
      */
     requiresNewFragment(node: SerializedNode): false | string {
+        // return false for conditions where a new fragment is not required
+        if (node.isRoot || !isElementNode(node)) {
+            return false;
+        }
+
+        // @todo: find conditions where a new fragment is necessary
         return false;
     },
 };

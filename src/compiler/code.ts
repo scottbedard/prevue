@@ -246,7 +246,7 @@ export default class Code
             const partialFn = 'get' + capitalize(camelCase(partial)) + 'Partial';
 
             if (typeof this[partialFn] === 'function') {
-                return this[partialFn](this).toString();
+                return getCodeFromContent(this[partialFn](this)).toString();
             }
             
             // dynamic partials (deprecated, use partial functions instead)
@@ -295,7 +295,7 @@ function getCodeFromContent(content: Code | string): Code {
 function getDynamicPartial(code: Code, name: string): Code {
     const content = code.dynamicPartials[name](code);
 
-    return typeof content === 'string' ? new Code(content): content;
+    return getCodeFromContent(content);
 }
 
 /**

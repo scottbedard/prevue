@@ -54,13 +54,7 @@ export default class Compiler
      * @return  {CompilerOutput}
      */
     compile(): CompilerOutput {
-        this.code = new Code(`
-            :fragments
-
-            return function ${this.options.name}() {
-                :init
-            }
-        `);
+        this.code = createCodeInstance(this);
 
         // create a main fragment, and assign it to a variable in our "init" partial
         const mainFragmentVar = this.code.generateNamedIdentifier('mainFragment');
