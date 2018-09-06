@@ -49,7 +49,7 @@ export interface ParsedSource {
 // the first part of our compilation process is to serialize the
 // template. this interfaces represents the shape of thot serialization.
 export interface SerializedNode {
-    children: Array<SerializedNode> | null,
+    children: Array<SerializedNode>,
     dynamicAttrs: NodeDynamicAttrs,
     nodeType: NodeType,
     staticAttrs: NodeStaticAttrs | null,

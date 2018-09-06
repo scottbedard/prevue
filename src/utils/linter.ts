@@ -9,11 +9,15 @@ type Rules = {
 
 const rules: Rules = {
     'comma-style': ['error', 'last'],
-    'indent': ['error', 4, { "ObjectExpression": 1 }],
+    'indent': ['error', 4],
     'key-spacing': ['error', { 
         afterColon: true, 
         beforeColon: false,
         mode: 'strict',
+    }],
+    'keyword-spacing': ['error', { 
+        before: true, 
+        after: true,
     }],
     'newline-before-return': 'error',
     'no-multi-spaces': ['error', 'always'],
@@ -30,7 +34,6 @@ const rules: Rules = {
     'semi': ['error', 'always', {
         omitLastInOneLineBlock: false
     }],
-    'space-before-keywords': ['error', 'always'],
 }
 
 /**

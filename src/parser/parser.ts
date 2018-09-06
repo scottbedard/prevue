@@ -27,18 +27,18 @@ export function parse(source: string, options: CompilerOptions): ParsedSource {
 /**
  * Get child nodes, and purge empty text nodes if whitespace is being trimmed.
  * 
- * @param  {Element}                    node
- * @param  {NodeType}                   nodeType
- * @param  {CompilerOptions}            options
- * @return {Array<SerializedNode>|null}
+ * @param  {Element}                node
+ * @param  {NodeType}               nodeType
+ * @param  {CompilerOptions}        options
+ * @return {Array<SerializedNode>}
  */
 function getChildNodes(
     node: Element, 
     nodeType: NodeType, 
     options: CompilerOptions
-): Array<SerializedNode> | null {
+): Array<SerializedNode> {
     if (nodeType === 'text') {
-        return null;
+        return [];
     }
 
     return Array.from(node.childNodes).reduce<Array<SerializedNode>>((children, child) => {

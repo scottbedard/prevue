@@ -151,4 +151,5 @@ function processFragment(compiler: Compiler, fragment: Fragment, node: Serialize
     // 3. call any post-processors that are defined
 
     // 4. recursively process child nodes
+    node.children.forEach(child => processFragment(compiler, currentFragment, child));
 }

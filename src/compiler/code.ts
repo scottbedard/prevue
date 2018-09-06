@@ -257,7 +257,7 @@ export default class Code
             // default partial resolution
             return this.partials[name]
                 .map(code => code.toString())
-                .join('\n');
+                .join('\n\n');
         });
 
         return output.replace(/\n\n\n+/g, '\n\n').trim();
