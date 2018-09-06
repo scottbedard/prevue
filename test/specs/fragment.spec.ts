@@ -22,9 +22,9 @@ describe('fragment', function () {
             function whatever() {
                 return {
                     c: noop,
-                    d: noop,
                     m: noop,
                     p: noop,
+                    d: noop,
                 };
             }
         `);
@@ -43,9 +43,9 @@ describe('fragment', function () {
             
                 return {
                     c: noop,
-                    d: noop,
                     m: noop,
                     p: noop,
+                    d: noop,
                 };
             }
         `);
@@ -55,9 +55,9 @@ describe('fragment', function () {
         const fragment = new Fragment('whatever');
 
         fragment.append('// create', 'create');
-        fragment.append('// destroy', 'destroy');
         fragment.append('// mount', 'mount');
         fragment.append('// update', 'update');
+        fragment.append('// destroy', 'destroy');
 
         expectCode(fragment.render()).to.equal(`
             function whatever() {
@@ -65,14 +65,14 @@ describe('fragment', function () {
                     c: function create() {
                         // create
                     },
-                    d: function destroy() {
-                        // destroy
-                    },
-                    m: function mount() {
+                    m: function mount(target, anchor) {
                         // mount
                     },
                     p: function update() {
                         // update
+                    },
+                    d: function destroy() {
+                        // destroy
                     },
                 };
             }
