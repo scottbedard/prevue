@@ -51,6 +51,7 @@ export interface ParsedSource {
 export interface SerializedNode {
     children: Array<SerializedNode>,
     dynamicAttrs: NodeDynamicAttrs,
+    isRoot: boolean,
     nodeType: NodeType,
     staticAttrs: NodeStaticAttrs | null,
     tagName: string | null,

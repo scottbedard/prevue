@@ -17,7 +17,7 @@ import {
  */
 export function parse(source: string, options: CompilerOptions): ParsedSource {
     const rootElement = getRootElement(source);
-    const template = serializeNode(rootElement, options);
+    const template = serializeNode(rootElement, true, options);
 
     return {
         template
@@ -42,7 +42,7 @@ function getChildNodes(
     }
 
     return Array.from(node.childNodes).reduce<Array<SerializedNode>>((children, child) => {
-        const childNode = serializeNode(<Element> child, options);
+        const childNode = serializeNode(<Element> child, false, options);
 
         // skip entirely empty text nodes if we're trimming whitespace
         if (options.trimWhitespace && childNode.nodeType === 'text' && childNode.textContent === '') {
@@ -178,15 +178,17 @@ function getTextContent(node: Element, nodeType: NodeType, options: CompilerOpti
  * Serialize a dom node and all of it's children.
  * 
  * @param  {Element}            el          the element being serialized
+ * @param  {boolean}            isRoot      determines if this is the root node
  * @param  {CompilerOptions}    options     compiler options
  * @return {Object}
  */
-function serializeNode(node: Element, options: CompilerOptions): SerializedNode {
+function serializeNode(node: Element, isRoot: boolean, options: CompilerOptions): SerializedNode {
     const nodeType = getNodeType(node);
 
     return {
         children: getChildNodes(node, nodeType, options),
         dynamicAttrs: getDynamicAttrs(node, nodeType, options),
+        isRoot,
         nodeType,
         staticAttrs: getStaticAttrs(node, nodeType),
         tagName: getTagName(node, nodeType),
