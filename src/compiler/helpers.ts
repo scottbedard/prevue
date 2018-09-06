@@ -27,6 +27,20 @@ const createText = (name: string): string => `
 `;
 
 /**
+ * Initialize a component.
+ * 
+ * @param  {string} name 
+ * @return {string}
+ */
+const init = (name: string): string => `
+    function ${name}(vm, options) {
+        vm.$mount = function(target) {
+            console.log ('mounting');
+        }
+    }
+`;
+
+/**
  * Insert an element into the dom.
  * 
  * @param  {string} text
@@ -54,6 +68,7 @@ const noop = (name: string): string => `
 const helpers: Helpers = {
     createElement,
     createText,
+    init,
     insert,
     noop,
 };

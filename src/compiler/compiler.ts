@@ -56,6 +56,10 @@ export default class Compiler
     compile(): CompilerOutput {
         this.code = createCodeInstance(this);
 
+        // bind initialization helpers
+        this.code.registerHelper('init');
+        this.code.append(`init(this);`, 'init');
+
         // create a main fragment, and assign it to a variable in our "init" partial
         const mainFragmentVar = this.code.generateNamedIdentifier('mainFragment');
         const mainFragment = createFragment(this, 'createMainFragment');
