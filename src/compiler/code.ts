@@ -6,6 +6,7 @@ import { sortBy, uniq } from 'lodash';
 type DynamicPartialResolver = (code?: Code) => Code | string;
 
 interface CodeOptions {
+    helpers?: 'inline' | 'import',
     identifiers?: Array<string>,
 }
 
@@ -28,6 +29,11 @@ export default class Code
      * @var {DynamicPartials} dynamicPartials
      */
     dynamicPartials: DynamicPartials = {};
+
+    /**
+     * @var {'inline'|'import'} helpers
+     */
+    helpers: 'inline' | 'import';
 
     /**
      * @var {Array<string>} identifiers
@@ -57,6 +63,7 @@ export default class Code
     constructor(src: string = '', options: CodeOptions = {}) {
         this.src = removeLeadingIndentation(src);
         this.partials = findPartials(this);
+        this.helpers = options.helpers || 'inline';
         this.identifiers = options.identifiers || [];
     }
 
@@ -185,7 +192,7 @@ export default class Code
             return this.root.render();
         }
 
-        let output = replaceHelpers(this.toString());
+        let output = replaceHelpers(this);
 
         return lint(output.trim());
     }
@@ -320,13 +327,24 @@ function removeLeadingIndentation(src: string): string {
 /**
  * Replace helpers in source code.
  * 
- * @param  {string} src
+ * @param  {Code}   code
  * @return {string}
  */
-function replaceHelpers(src: string): string {
-    const helperSrc = sortBy(uniq(findHelpers(src)))
-        .map(name => (<any>helpers)[name])
-        .join('\n');
+function replaceHelpers(code: Code): string {
+    let src = code.toString();
+    const usedHelpers = sortBy(uniq(findHelpers(src)));
 
-    return (helperSrc + '\n' + src).replace(/\@\w+/g, name => name.slice(1));
+    // inline helpers
+    if (code.helpers === 'inline') {
+        const helperSrc = usedHelpers.map(name => (<any>helpers)[name]).join('\n');
+        src = helperSrc + '\n' + src
+    } 
+    
+    // imported helpers
+    else {
+        const helperSrc = `import { ${usedHelpers.join(', ') } } from '@prevue/prevue'`;
+        src = helperSrc + '\n' + src;
+    }
+   
+    return src.replace(/\@(?!prevue)\w+/g, name => name.slice(1));;
 }

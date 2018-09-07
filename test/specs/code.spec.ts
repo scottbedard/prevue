@@ -181,7 +181,18 @@ describe('code generation', function () {
 
     it('can inline helpers with a reserved name');
 
-    it('can import helpers');
+    it('can import helpers', function() {
+        const code = new Code(`
+            @noop();
+        `, {
+            helpers: 'import',
+        });
+
+        expectCode(code.render()).to.equal(`
+            import { noop } from '@prevue/prevue';
+            noop();
+        `);
+    });
 
     it('can import helpers with a reserved name');
 });

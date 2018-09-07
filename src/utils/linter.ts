@@ -52,6 +52,7 @@ export function lint(src: string): string {
                 globalReturn: true,
             },
             ecmaVersion: 6,
+            sourceType: 'module',
         },
         rules,
     });
