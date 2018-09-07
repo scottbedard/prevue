@@ -47,7 +47,7 @@ export default class Fragment extends Code
      */
     getMountPartial(): string {
         if (this.partialIsEmpty('mount')) {
-            return this.registerHelper('noop');
+            return '@noop';
         }
 
         return `
@@ -65,7 +65,7 @@ export default class Fragment extends Code
      */
     getPartial(name: string): string {
         if (this.partialIsEmpty(name)) {
-            return this.registerHelper('noop');
+            return '@noop';
         }
 
         return `

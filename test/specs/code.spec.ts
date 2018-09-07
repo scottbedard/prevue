@@ -133,53 +133,6 @@ describe('code generation', function () {
         expect(child.getNamedIdentifier('noop')).to.equal('noop');
     });
 
-    it('can be rendered with helpers', function () {
-        const parent = new Code(`
-            if (foo) {
-                :children
-            }
-        `);
-
-        const noop = parent.registerHelper('noop');
-
-        parent.append(`
-            ${noop}();
-        `, 'children');
-
-        expectCode(parent.render()).to.equal(`
-            function noop(){}
-            
-            if (foo) {
-                noop();
-            }
-        `);
-    });
-
-    it('only includes a helper once', function () {
-        const parent = new Code(`
-            if (foo) {
-                :children
-            }
-        `);
-
-        const noop1 = parent.registerHelper('noop');
-        const noop2 = parent.registerHelper('noop');
-
-        parent.append(`
-            ${noop1}();
-            ${noop2}();
-        `, 'children');
-
-        expectCode(parent.render()).to.equal(`
-            function noop(){}
-
-            if (foo) {
-                noop();
-                noop();
-            }
-        `);
-    });
-
     it('automatically registers dynamic partials by method naming convention', function () {
         class Foo extends Code {
             constructor() {
@@ -199,4 +152,36 @@ describe('code generation', function () {
             bar();
         `);
     });
+
+    it('can inline helpers', function() {
+        const code = new Code(`
+            @noop();
+        `);
+
+        expectCode(code.render()).to.equal(`
+            function noop() {}
+            noop();
+        `);
+    });
+
+    it('only includes a helper once', function () {
+        const code = new Code(`
+            @noop();
+            @noop();
+            @noop();
+        `);
+
+        expectCode(code.render()).to.equal(`
+            function noop() {}
+            noop();
+            noop();
+            noop();
+        `);
+    })
+
+    it('can inline helpers with a reserved name');
+
+    it('can import helpers');
+
+    it('can import helpers with a reserved name');
 });

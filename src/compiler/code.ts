@@ -1,6 +1,7 @@
-import helpers from './helpers';
+import * as helpers from './helpers';
 import { camelCase, capitalize } from 'lodash';
 import { lint } from 'src/utils/linter';
+import { sortBy, uniq } from 'lodash';
 
 type DynamicPartialResolver = (code?: Code) => Code | string;
 
@@ -27,11 +28,6 @@ export default class Code
      * @var {DynamicPartials} dynamicPartials
      */
     dynamicPartials: DynamicPartials = {};
-
-    /**
-     * @var {Helpers} helpers
-     */
-    helpers: Array<string> = [];
 
     /**
      * @var {Array<string>} identifiers
@@ -165,26 +161,6 @@ export default class Code
     }
 
     /**
-     * Register a helper.
-     * 
-     * @param  {string} name
-     * @return {string}
-     */
-    public registerHelper(name: string): string {
-        if (typeof helpers[name] === 'undefined') {
-            throw new Error(`Failed to register helper "${name}", function not found.`);
-        }
-
-        const root = this.root;
-
-        if (root.helpers.indexOf(name) === -1) {
-            root.helpers.push(name);
-        }
-        
-        return root.getNamedIdentifier(name);
-    }
-
-    /**
      * Get the root code instance.
      * 
      * @return {Code|null}
@@ -209,18 +185,7 @@ export default class Code
             return this.root.render();
         }
 
-        let output = this.toString();
-        
-        this.helpers
-            .slice(0)
-            .sort()
-            .filter((helper: string) => typeof helpers[helper] === 'function')
-            .forEach((helper: string) => {
-                const name = this.generateNamedIdentifier(helper);
-                const helperFn = helpers[helper](name);
-
-                output = helperFn + '\n\n' + output;
-            });
+        let output = replaceHelpers(this.toString());
 
         return lint(output.trim());
     }
@@ -239,7 +204,7 @@ export default class Code
         });
 
         // replace partials
-        output = output.replace(/\:\w+/g, (partial: string, offset): string => {
+        output = output.replace(/\:\w+/g, (partial: string): string => {
             const name = partial.slice(1);
 
             // dynamic partials
@@ -262,6 +227,27 @@ export default class Code
 
         return output.replace(/\n\n\n+/g, '\n\n').trim();
     }
+}
+
+/**
+ * Recursively find all helpers.
+ * 
+ * @param  {string}         src
+ * @return {Array<string>} 
+ */
+function findHelpers(src: string): Array<string> {
+    const result = (src.match(/\@\w+/g) || []).map(rawName => rawName.slice(1));
+
+    result.forEach(name => {
+        if (typeof (<any>helpers)[name] !== 'string') {
+            throw `Unknown helper "${name}"`;
+        }
+
+        findHelpers((<any>helpers)[name])
+            .forEach(subHelper => result.push(subHelper));
+    });
+
+    return result;
 }
 
 /**
@@ -329,4 +315,18 @@ function removeLeadingIndentation(src: string): string {
     }
 
     return lines.join('\n').trim();
+}
+
+/**
+ * Replace helpers in source code.
+ * 
+ * @param  {string} src
+ * @return {string}
+ */
+function replaceHelpers(src: string): string {
+    const helperSrc = sortBy(uniq(findHelpers(src)))
+        .map(name => (<any>helpers)[name])
+        .join('\n');
+
+    return (helperSrc + '\n' + src).replace(/\@\w+/g, name => name.slice(1));
 }

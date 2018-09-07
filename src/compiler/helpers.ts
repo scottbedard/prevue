@@ -1,15 +1,11 @@
-interface Helpers {
-    [key: string]: (name: string) => string,
-}
-
 /**
  * Create a dom element.
  * 
- * @param  {string} tag
- * @return {string}
+ * @param  {string}         tag
+ * @return {HTMLElement}
  */
-const createElement = (name: string): string => `
-    function ${name}(tag) {
+export const createElement = `
+    function createElement(tag) {
         return document.createElement(tag);
     }
 `;
@@ -17,25 +13,22 @@ const createElement = (name: string): string => `
 /**
  * Create a text node.
  * 
- * @param  {string} text
- * @return {string}
+ * @param  {String} text
+ * @return {Text}
  */
-const createText = (name: string): string => `
-    function ${name}(text) {
+export const createText = `
+    function createText(text) {
         return document.createTextNode(text);
     }
 `;
 
 /**
  * Initialize a component.
- * 
- * @param  {string} name 
- * @return {string}
  */
-const init = (name: string): string => `
-    function ${name}(vm, options) {
-        vm.$mount = function(target) {
-            console.log ('mounting');
+export const init = `
+    function init(component: any, options: any) {
+        component.$mount = function(target: any) {
+            console.log('mounting');
         }
     }
 `;
@@ -43,11 +36,13 @@ const init = (name: string): string => `
 /**
  * Insert an element into the dom.
  * 
- * @param  {string} text
- * @return {string}
+ * @param  {Node}   target
+ * @param  {any}    node
+ * @param  {Node}   anchor
+ * @return {void}
  */
-const insert = (name: string): string => `
-    function ${name}(target, node, anchor) {
+export const insert = `
+    function insert(target, node, anchor) {
         target.insertBefore(node, anchor);
     }
 `;
@@ -55,23 +50,8 @@ const insert = (name: string): string => `
 /**
  * No-operation.
  * 
- * @param  {string}     name
- * @return {string}
+ * @return {void}
  */
-const noop = (name: string): string => `
-    function ${name}(){}
+export const noop = `
+    function noop() {}
 `;
-
-/**
- * Export
- */
-const helpers: Helpers = {
-    createElement,
-    createText,
-    init,
-    insert,
-    noop,
-};
-
-export default helpers;
-

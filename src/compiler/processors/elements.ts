@@ -27,13 +27,11 @@ export const elementProcessor: FragmentProcessor = {
 
         // create
         // instantiate the element and assign it to our variable
-        const createElement = fragment.registerHelper('createElement');
-        fragment.append(`${el} = ${createElement}('${node.tagName}');`, 'create');
+        fragment.append(`${el} = @createElement('${node.tagName}');`, 'create');
 
         // mount
         // insert our element into the dom
-        const insert = fragment.registerHelper('insert');
-        fragment.append(`${insert}(target, ${el}, anchor);`, 'mount');
+        fragment.append(`@insert(target, ${el}, anchor);`, 'mount');
 
         // @todo: update
 

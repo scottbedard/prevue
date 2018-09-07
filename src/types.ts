@@ -20,11 +20,6 @@ export interface FragmentProcessor {
     requiresNewFragment: (node: SerializedNode) => false | string,
 }
 
-// constructable types
-export interface Constructable<T> {
-    new() : T;
-}
-
 // dynamic node attributes
 export interface NodeDynamicAttrs {
     [key: string]: {
