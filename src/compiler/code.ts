@@ -353,7 +353,12 @@ function replaceHelpers(code: Code): string {
     
     // imported helpers
     else {
+        usedHelpers.forEach(name => {
+            namedHelpers[name] = code.generateNamedIdentifier(name);
+        });
+        
         const helperSrc = `import { ${usedHelpers.join(', ') } } from '@prevue/prevue'`;
+        
         src = helperSrc + '\n' + src;
     }
    

@@ -13,7 +13,7 @@ describe('code generation', function () {
             if (foo) {
                 bar();
             }
-        `).to.equal(`if (foo) { bar() }`)
+        `).to.equal(`if (foo) { bar() }`);
 
         // different statement endings
         expectCode(`foo()`).to.equal(`foo();`);
@@ -26,6 +26,9 @@ describe('code generation', function () {
 
         // asserting with code objects
         expectCode(new Code(`let one = 1`)).to.equal(`let one = 1`);
+
+        // asserting inequality
+        expectCode('foo()').not.to.equal('bar()');
     });
 
     it('appends to partials', function () {
