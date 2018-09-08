@@ -179,7 +179,20 @@ describe('code generation', function () {
         `);
     })
 
-    it('can inline helpers with a reserved name');
+    it('can inline helpers with a reserved name', function () {
+        const code = new Code(`
+            @noop();
+            @noop();
+        `, {
+            identifiers: ['noop'], // <- mark noop as already taken
+        });
+
+        expectCode(code.render()).to.equal(`
+            function noop1() {}
+            noop1();
+            noop1();
+        `);
+    });
 
     it('can import helpers', function() {
         const code = new Code(`

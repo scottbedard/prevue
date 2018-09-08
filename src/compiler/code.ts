@@ -1,4 +1,5 @@
 import * as helpers from './helpers';
+import { IndexSignature } from 'src/types';
 import { camelCase, capitalize } from 'lodash';
 import { lint } from 'src/utils/linter';
 import { sortBy, uniq } from 'lodash';
@@ -333,10 +334,20 @@ function removeLeadingIndentation(src: string): string {
 function replaceHelpers(code: Code): string {
     let src = code.toString();
     const usedHelpers = sortBy(uniq(findHelpers(src)));
+    const namedHelpers: IndexSignature<string> = {};
 
     // inline helpers
     if (code.helpers === 'inline') {
-        const helperSrc = usedHelpers.map(name => (<any>helpers)[name]).join('\n');
+        const helperSrc = usedHelpers
+            .map(name => {
+                const availableName = code.generateNamedIdentifier(name);
+
+                namedHelpers[name] = availableName;
+
+                return (<string>(<any>helpers)[name]).replace(`function ${name}`, `function ${availableName}`)
+            })
+            .join('\n');
+
         src = helperSrc + '\n' + src
     } 
     
@@ -346,5 +357,5 @@ function replaceHelpers(code: Code): string {
         src = helperSrc + '\n' + src;
     }
    
-    return src.replace(/\@(?!prevue)\w+/g, name => name.slice(1));;
+    return src.replace(/\@(?!prevue)\w+/g, name => namedHelpers[name.slice(1)]);
 }

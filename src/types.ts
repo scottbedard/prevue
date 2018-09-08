@@ -20,6 +20,11 @@ export interface FragmentProcessor {
     requiresNewFragment: (node: SerializedNode) => false | string,
 }
 
+// index signature
+export interface IndexSignature<T> {
+    [key: string]: T,
+}
+
 // dynamic node attributes
 export interface NodeDynamicAttrs {
     [key: string]: {
