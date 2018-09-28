@@ -1,7 +1,26 @@
 import * as uglify from 'uglify-js';
 import Code from '../src/compiler/code';
+import { JSDOM } from 'jsdom';
 import { lint } from '../src/utils/linter';
+
 const babel = require('@babel/core');
+
+/**
+ * Create a dom to work with
+ * 
+ * @param  {string} source
+ * @return {JSDOM}
+ */
+export function createDom(source: string = '') {
+    return new JSDOM(`
+        <!doctype html>
+        <html>
+            <body>
+                ${source}
+            </body>
+        </html>
+    `);
+}
 
 /**
  * Helper function for making code assertions since Typescript

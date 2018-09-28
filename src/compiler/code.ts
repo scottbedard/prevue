@@ -207,7 +207,7 @@ export default class Code
         let output: string = this.src;
 
         // replace named identifiers
-        output = output.replace(/\$\w+/g, (partial, offset) => {
+        output = output.replace(/\#\w+/g, (partial, offset) => {
             return this.generateNamedIdentifier(partial.slice(1));
         });
 

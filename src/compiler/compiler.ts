@@ -57,8 +57,7 @@ export default class Compiler
         this.code = createCodeInstance(this);
 
         // bind initialization helpers
-        this.code.registerHelper('init');
-        this.code.append(`init(this);`, 'init');
+        this.code.append(`@init(this);`, 'init');
 
         // create a main fragment, and assign it to a variable in our "init" partial
         const mainFragmentVar = this.code.generateNamedIdentifier('mainFragment');
@@ -94,13 +93,18 @@ export default class Compiler
  */
 function createCodeInstance(compiler: Compiler): Code {
     // @todo: check options for output type
+    const Component = compiler.options.name;
 
     return new Code(`
         :fragments
 
-        return function ${compiler.options.name}() {
+        function ${Component}() {
             :init
         }
+
+        ${Component}.prototype.$mount = @mount;
+
+        module.exports = ${Component}
     `);
 }
 

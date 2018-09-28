@@ -26,10 +26,8 @@ export const createText = `
  * Initialize a component.
  */
 export const init = `
-    function init(component: any, options: any) {
-        component.$mount = function(target: any) {
-            console.log('mounting');
-        }
+    function init(component, options) {
+
     }
 `;
 
@@ -46,6 +44,15 @@ export const insert = `
         target.insertBefore(node, anchor);
     }
 `;
+
+/**
+ * Mount a component to the dom.
+ */
+export const mount = `
+    function mount(elementOrSelector) {
+        console.log('hey', this);
+    }
+`
 
 /**
  * No-operation.

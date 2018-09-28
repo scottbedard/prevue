@@ -18,7 +18,7 @@ describe('components', () => {
                 // compile our component to a function
                 const compiler = new Compiler({
                     cleanOutput: true,
-                    format: 'fn',
+                    format: 'module',
                     name: 'Component',
                     ...(test.options || {}),
                 }, source);
@@ -26,7 +26,7 @@ describe('components', () => {
                 const output = compiler.compile();
 
                 if (typeof test.test === 'function') {
-                    test.test(output, new Function(output.code)());
+                    test.test(output, new Function(output.code.replace('module.exports =', 'return'))());
                 }
             }
 
